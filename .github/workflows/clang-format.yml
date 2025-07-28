@@ -1,0 +1,23 @@
+name: Verificar clang-format
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  clang-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar clang-format
+        run: sudo apt-get install -y clang-format
+
+      - name: Verificar formatação dos arquivos
+        run: |
+          FILES=$(find . \( -name "*.c" -o -name "*.h" \) -not -path "./build/*")
+          clang-format --dry-run --Werror $FILES
