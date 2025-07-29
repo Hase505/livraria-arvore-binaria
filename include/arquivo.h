@@ -11,6 +11,6 @@ typedef struct {
 } CABECALHO;
 
 CABECALHO* le_cabecalho(FILE* arquivo);
-int escreve_cabecalho(FILE* arquivo, CABECALHO cabecalho);
+int escreve_cabecalho(FILE* arquivo, const CABECALHO* cabecalho);
 
 #endif  // ARQUIVO_H

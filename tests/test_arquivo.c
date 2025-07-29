@@ -80,7 +80,7 @@ static void test_escreve_cabecalho_valido(void** state) {
         cabecalho.topo = 3;
         cabecalho.quantidade_livros = 4;
 
-        int r = escreve_cabecalho(arquivo, cabecalho);
+        int r = escreve_cabecalho(arquivo, &cabecalho);
         assert_int_equal(r, SUCESSO);
 
         // Lê de volta para verificar se foi escrito corretamente

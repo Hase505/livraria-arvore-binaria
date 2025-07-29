@@ -22,9 +22,9 @@ CABECALHO* le_cabecalho(FILE* arquivo) {
         return cabecalho;
 }
 
-int escreve_cabecalho(FILE* arquivo, CABECALHO cabecalho) {
+int escreve_cabecalho(FILE* arquivo, const CABECALHO* cabecalho) {
         if (fseek(arquivo, 0, SEEK_SET) != 0) return ERRO_ARQUIVO_SEEK;
-        if (fwrite(&cabecalho, sizeof(CABECALHO), 1, arquivo) != 1) return ERRO_ARQUIVO_WRITE;
+        if (fwrite(cabecalho, sizeof(CABECALHO), 1, arquivo) != 1) return ERRO_ARQUIVO_WRITE;
 
         return SUCESSO;
 }
