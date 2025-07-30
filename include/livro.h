@@ -24,17 +24,17 @@ typedef struct {
         /**
          * Título do livro.
          */
-        char titulo[MAX_TITULO];
+        char titulo[MAX_TITULO + 1];
 
         /**
          * Autor do livro.
          */
-        char autor[MAX_AUTOR];
+        char autor[MAX_AUTOR + 1];
 
         /**
          * Editora do livro.
          */
-        char editora[MAX_EDITORA];
+        char editora[MAX_EDITORA + 1];
 
         /**
          * Edição do livro.
