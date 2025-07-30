@@ -3,12 +3,11 @@
  * @brief Implementa as funções para manipular o arquivo binário que armazenará a árvore binária.
  */
 
-#include "../include/arquivo.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "../include/arquivo.h"
 #include "../include/erros.h"
 
 /**
