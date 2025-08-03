@@ -8,7 +8,10 @@
 #include <string.h>
 
 #include "../include/arquivo.h"
+#include "../include/arvore.h"
 #include "../include/erros.h"
+
+#define POSICAO_INVALIDA -1
 
 /**
  * @brief Lê cabeçalho inserido em arquivo binário.
@@ -63,6 +66,120 @@ CABECALHO* le_cabecalho(FILE* arquivo) {
 int escreve_cabecalho(FILE* arquivo, const CABECALHO* cabecalho) {
         if (fseek(arquivo, 0, SEEK_SET) != 0) return ERRO_ARQUIVO_SEEK;
         if (fwrite(cabecalho, sizeof(CABECALHO), 1, arquivo) != 1) return ERRO_ARQUIVO_WRITE;
+
+        return SUCESSO;
+}
+
+NO_ARVORE* ler_no_arquivo(FILE* arquivo, const int posicao) {
+        if (arquivo == NULL) return NULL;
+
+        NO_ARVORE* no = malloc(sizeof(NO_ARVORE));
+        if (no == NULL) return NULL;
+
+        if (fseek(arquivo, sizeof(CABECALHO) + posicao * sizeof(NO_ARVORE), SEEK_SET) != 0) {
+                free(no);
+                return NULL;
+        }
+        if (fread(no, sizeof(NO_ARVORE), 1, arquivo) != 1) {
+                free(no);
+                return NULL;
+        }
+
+        return no;
+}
+
+static int escrever_no(FILE* arquivo, const NO_ARVORE* no, const int posicao) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+        if (no == NULL) return ERRO_NO_NULO;
+
+        if (fseek(arquivo, sizeof(CABECALHO) + posicao * sizeof(NO_ARVORE), SEEK_SET) != 0)
+                return ERRO_ARQUIVO_SEEK;
+        if (fwrite(no, sizeof(NO_ARVORE), 1, arquivo) != 1) return ERRO_ARQUIVO_WRITE;
+
+        return SUCESSO;
+}
+
+int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+
+        if (no_arvore == NULL) return ERRO_NO_NULO;
+
+        CABECALHO* cabecalho = le_cabecalho(arquivo);
+        if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
+
+        if (cabecalho->livre != POSICAO_INVALIDA) {
+                NO_ARVORE* no_livre = ler_no_arquivo(arquivo, cabecalho->livre);
+                if (no_livre == NULL) {
+                        free(cabecalho);
+                        return ERRO_NO_NULO;
+                }
+
+                int r = escrever_no(arquivo, no_arvore, cabecalho->livre);
+                if (r != SUCESSO) {
+                        free(cabecalho);
+                        free(no_livre);
+                        return r;
+                }
+
+                cabecalho->livre = no_livre->filho_esquerdo;
+                free(no_livre);
+        } else {
+                int r = escrever_no(arquivo, no_arvore, cabecalho->topo);
+                if (r != SUCESSO) {
+                        free(cabecalho);
+                        return r;
+                }
+
+                cabecalho->topo++;
+        }
+
+        cabecalho->quantidade_livros++;
+        int r = escreve_cabecalho(arquivo, cabecalho);
+        if (r != SUCESSO) {
+                free(cabecalho);
+                return r;
+        }
+
+        free(cabecalho);
+
+        return SUCESSO;
+}
+
+int remover_no_arquivo(FILE* arquivo, const int posicao) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+
+        CABECALHO* cabecalho = le_cabecalho(arquivo);
+        if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
+
+        NO_ARVORE* no_removido = ler_no_arquivo(arquivo, posicao);
+        if (no_removido == NULL) {
+                free(cabecalho);
+                return ERRO_NO_NULO;
+        }
+
+        memset(&no_removido->livro, 0, sizeof(LIVRO));
+        no_removido->filho_direito = POSICAO_INVALIDA;
+        no_removido->filho_esquerdo = cabecalho->livre;
+
+        cabecalho->livre = posicao;
+        cabecalho->quantidade_livros--;
+
+        int r = escrever_no(arquivo, no_removido, posicao);
+        if (r != SUCESSO) {
+                free(cabecalho);
+                free(no_removido);
+                return r;
+        }
+
+        r = escreve_cabecalho(arquivo, cabecalho);
+        if (r != SUCESSO) {
+                free(cabecalho);
+                free(no_removido);
+                return r;
+        }
+
+        free(cabecalho);
+        free(no_removido);
 
         return SUCESSO;
 }

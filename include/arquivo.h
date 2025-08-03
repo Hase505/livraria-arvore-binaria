@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 
+#include "arvore.h"
+
 /**
  * Estrutura que contém informações necessárias
  * para armazenar árvore binária de livros em arquivo.
@@ -72,5 +74,9 @@ CABECALHO* le_cabecalho(FILE* arquivo);
  * @post Em caso de erro, o conteúdo do arquivo pode estar indefinido.
  */
 int escreve_cabecalho(FILE* arquivo, const CABECALHO* cabecalho);
+
+int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore);
+int remover_no_arquivo(FILE* arquivo, const int codigo);
+NO_ARVORE* ler_no(FILE* arquivo, const int posicao);
 
 #endif  // ARQUIVO_H
