@@ -85,3 +85,83 @@ int buscar_no_arvore(FILE* arquivo, size_t codigo, RESULTADO_BUSCA* resultado) {
 
         return SUCESSO;
 }
+
+/**
+ * @brief Cadastra um novo livro na árvore binária de busca no arquivo.
+ *
+ * @param arquivo Ponteiro para arquivo binário aberto em modo leitura/escrita ("rb+").
+ * @param novo Estrutura LIVRO a ser inserida (com id unico ja checado).
+ * @return Código de retorno (SUCESSO ou erro definido em erros.h).
+ *
+ * @warning Sempre feche (fclose) o arquivo após inserir um livro e reabra antes de
+ * buscar/verificar. Isso garante que os dados estejam sincronizados no disco.
+ */
+int inserir_no_arvore(FILE* arquivo, NO_ARVORE* novo) {
+        int status;
+        CABECALHO* cabecalho = le_cabecalho(arquivo);
+        if (!cabecalho) {
+                return ERRO_CABECALHO_NULO;
+        }
+        int pos_novo;
+
+        // Caso especial: árvore vazia
+        if (cabecalho->raiz == -1) {
+                status = inserir_no_arquivo(arquivo, novo, &pos_novo);
+                if (status != SUCESSO) {
+                        free(cabecalho);
+                        return status;
+                }
+                cabecalho->raiz = pos_novo;
+                status = escreve_cabecalho(arquivo, cabecalho);
+                free(cabecalho);
+                return status;
+        }
+
+        // Busca posição para inserir
+        int pos_atual = cabecalho->raiz;
+        int pos_pai = -1;
+        int filho_esq_ou_dir = 0;
+        NO_ARVORE* no_atual = NULL;
+        NO_ARVORE* no_pai = NULL;
+
+        while (pos_atual != -1) {
+                no_atual = ler_no_arquivo(arquivo, pos_atual);
+                if (!no_atual) {
+                        if (no_pai) free(no_pai);
+                        free(cabecalho);
+                        return ERRO_NO_NULO;
+                }
+                pos_pai = pos_atual;
+
+                if (no_pai) free(no_pai);  // libera o anterior
+                no_pai = no_atual;         // guarda como pai
+
+                if (novo->livro.codigo < no_atual->livro.codigo) {
+                        filho_esq_ou_dir = 0;
+                        pos_atual = no_atual->filho_esquerdo;
+                } else {
+                        filho_esq_ou_dir = 1;
+                        pos_atual = no_atual->filho_direito;
+                }
+        }
+
+        // Inserir novo nó e obter posição real
+        status = inserir_no_arquivo(arquivo, novo, &pos_novo);
+        if (status != SUCESSO) {
+                if (no_pai) free(no_pai);
+                free(cabecalho);
+                return status;
+        }
+
+        // Atualizar ponteiro do pai
+        if (filho_esq_ou_dir == 0)
+                no_pai->filho_esquerdo = pos_novo;
+        else
+                no_pai->filho_direito = pos_novo;
+
+        status = escrever_no(arquivo, no_pai, pos_pai);
+
+        if (no_pai) free(no_pai);
+        free(cabecalho);
+        return status;
+}

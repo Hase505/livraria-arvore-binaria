@@ -79,4 +79,16 @@ typedef struct {
  */
 int buscar_no_arvore(FILE* arquivo, size_t codigo, RESULTADO_BUSCA* resultado);
 
+/**
+ * @brief Cadastra um novo livro na árvore binária de busca no arquivo.
+ *
+ * @param arquivo Ponteiro para arquivo binário aberto em modo leitura/escrita ("rb+").
+ * @param novo Estrutura LIVRO a ser inserida (com id unico ja checado).
+ * @return Código de retorno (SUCESSO ou erro definido em erros.h).
+ *
+ * @warning Sempre feche (fclose) o arquivo após inserir um livro e reabra antes de
+ * buscar/verificar. Isso garante que os dados estejam sincronizados no disco.
+ */
+int inserir_no_arvore(FILE* arquivo, NO_ARVORE* novo);
+
 #endif
