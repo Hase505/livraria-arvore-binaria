@@ -295,6 +295,70 @@ static void test_inserir_no_valido_com_lista_livre(void** state) {
 }
 
 /**
+ * @test Verifica se ler_no_arquivo retorna NULL quando arquivo é NULL ou posição inválida.
+ */
+static void test_ler_no_arquivo_parametros_invalidos(void** state) {
+        (void)state;
+        NO_ARVORE* no = ler_no_arquivo(NULL, 0);
+        assert_null(no);
+        FILE* arquivo = tmpfile();
+        assert_non_null(arquivo);
+        no = ler_no_arquivo(arquivo, -1);
+        assert_null(no);
+        fclose(arquivo);
+}
+
+/**
+ * @test Verifica se ler_no_arquivo lê corretamente um nó válido do arquivo.
+ */
+static void test_ler_no_arquivo_valido(void** state) {
+        FILE* arquivo = *state;
+        LIVRO livro = aux_criar_livro_valido(42);
+
+        NO_ARVORE no = {0};
+        no.livro = livro;
+        no.filho_direito = -1;
+        no.filho_esquerdo = -1;
+        inserir_no_arquivo(arquivo, &no);
+
+        NO_ARVORE* no_lido = ler_no_arquivo(arquivo, 0);
+        assert_non_null(no_lido);
+        assert_int_equal(no_lido->livro.codigo, 42);
+        assert_int_equal(no_lido->filho_direito, -1);
+        assert_int_equal(no_lido->filho_esquerdo, -1);
+        free(no_lido);
+}
+
+/**
+ * @test Verifica se remover_no_arquivo remove corretamente um nó e atualiza a lista livre.
+ */
+static void test_remover_no_arquivo_valido(void** state) {
+        FILE* arquivo = *state;
+        LIVRO livro = aux_criar_livro_valido(99);
+
+        NO_ARVORE no = {0};
+        no.livro = livro;
+        no.filho_direito = -1;
+        no.filho_esquerdo = -1;
+
+        inserir_no_arquivo(arquivo, &no);
+        int r = remover_no_arquivo(arquivo, 0);
+        assert_int_equal(r, SUCESSO);
+
+        CABECALHO cabecalho = {0};
+        fseek(arquivo, 0, SEEK_SET);
+        fread(&cabecalho, sizeof(CABECALHO), 1, arquivo);
+
+        assert_int_equal(cabecalho.quantidade_livros, 0);
+        assert_int_equal(cabecalho.livre, 0);
+
+        NO_ARVORE no_removido = {0};
+        fseek(arquivo, sizeof(CABECALHO) + 0 * sizeof(NO_ARVORE), SEEK_SET);
+        fread(&no_removido, sizeof(NO_ARVORE), 1, arquivo);
+        assert_int_equal(no_removido.filho_esquerdo, POSICAO_INVALIDA);
+}
+
+/**
  * @brief Retorna a lista de testes de arquivo a serem executados.
  *
  * @param[out] n Número de testes.
@@ -312,6 +376,13 @@ const struct CMUnitTest* arquivo_tests(int* n) {
                                             teardown_arquivo_valido),
             cmocka_unit_test_setup_teardown(test_inserir_no_valido_com_lista_livre,
                                             setup_criar_arquivo_valido_com_lista_livre,
+                                            teardown_arquivo_valido),
+            cmocka_unit_test(test_ler_no_arquivo_parametros_invalidos),
+            cmocka_unit_test_setup_teardown(test_ler_no_arquivo_valido,
+                                            setup_criar_arquivo_valido_sem_lista_livre,
+                                            teardown_arquivo_valido),
+            cmocka_unit_test_setup_teardown(test_remover_no_arquivo_valido,
+                                            setup_criar_arquivo_valido_sem_lista_livre,
                                             teardown_arquivo_valido)};
 
         *n = sizeof(tests) / sizeof(tests[0]);
