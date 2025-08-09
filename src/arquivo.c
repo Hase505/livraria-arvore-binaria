@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "../include/arquivo.h"
+#include "../include/arvore.h"
 #include "../include/erros.h"
 
 /**
@@ -63,6 +64,182 @@ CABECALHO* le_cabecalho(FILE* arquivo) {
 int escreve_cabecalho(FILE* arquivo, const CABECALHO* cabecalho) {
         if (fseek(arquivo, 0, SEEK_SET) != 0) return ERRO_ARQUIVO_SEEK;
         if (fwrite(cabecalho, sizeof(CABECALHO), 1, arquivo) != 1) return ERRO_ARQUIVO_WRITE;
+
+        return SUCESSO;
+}
+
+/**
+ * @brief Lê um nó da árvore do arquivo na posição especificada.
+ *
+ * Lê um NO_ARVORE da posição `posicao` no arquivo binário, considerando o
+ * cabeçalho no início. Aloca dinamicamente a estrutura que deve ser liberada pelo chamador.
+ *
+ * @param[in] arquivo Ponteiro para arquivo aberto para leitura.
+ * @param[in] posicao Índice do nó a ser lido (posição relativa após o cabeçalho).
+ * @return Ponteiro para o nó lido ou NULL em caso de erro.
+ *
+ * @pre `arquivo` deve ser diferente de NULL.
+ * @pre `posicao` deve ser válida (não negativa).
+ *
+ * @post Se bem-sucedida, retorna um ponteiro para NO_ARVORE alocado dinamicamente.
+ * @post Ponteiro do arquivo é reposicionado para a posição do nó.
+ */
+NO_ARVORE* ler_no_arquivo(FILE* arquivo, const int posicao) {
+        if (arquivo == NULL) return NULL;
+
+        NO_ARVORE* no = malloc(sizeof(NO_ARVORE));
+        if (no == NULL) return NULL;
+
+        if (fseek(arquivo, sizeof(CABECALHO) + posicao * sizeof(NO_ARVORE), SEEK_SET) != 0) {
+                free(no);
+                return NULL;
+        }
+        if (fread(no, sizeof(NO_ARVORE), 1, arquivo) != 1) {
+                free(no);
+                return NULL;
+        }
+
+        return no;
+}
+
+/**
+ * @brief Escreve um nó da árvore na posição especificada do arquivo.
+ *
+ * Posiciona o ponteiro do arquivo na posição correta (após o cabeçalho) e
+ * grava o nó informado.
+ *
+ * @param[in,out] arquivo Ponteiro para arquivo aberto em modo escrita.
+ * @param[in] no Ponteiro para o nó que será escrito.
+ * @param[in] posicao Índice no arquivo onde o nó será escrito.
+ * @return Código de erro: SUCESSO (0) ou código negativo em caso de falha.
+ *
+ * @pre `arquivo` e `no` devem ser diferentes de NULL.
+ * @pre `posicao` deve ser válida (não negativa).
+ *
+ * @post O nó será escrito na posição indicada do arquivo.
+ */
+static int escrever_no(FILE* arquivo, const NO_ARVORE* no, const int posicao) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+        if (no == NULL) return ERRO_NO_NULO;
+
+        if (fseek(arquivo, sizeof(CABECALHO) + posicao * sizeof(NO_ARVORE), SEEK_SET) != 0)
+                return ERRO_ARQUIVO_SEEK;
+        if (fwrite(no, sizeof(NO_ARVORE), 1, arquivo) != 1) return ERRO_ARQUIVO_WRITE;
+
+        return SUCESSO;
+}
+
+/**
+ * @brief Insere um nó na árvore no arquivo, utilizando lista livre se disponível.
+ *
+ * Se existir posição livre (removida anteriormente), reutiliza-a; caso contrário,
+ * insere no topo do arquivo, incrementando o topo. Atualiza o cabeçalho.
+ *
+ * @param[in,out] arquivo Ponteiro para arquivo aberto para leitura e escrita.
+ * @param[in] no_arvore Ponteiro para o nó a ser inserido.
+ * @return Código de retorno: SUCESSO (0) ou erro específico.
+ *
+ * @pre `arquivo` e `no_arvore` não podem ser NULL.
+ * @pre Arquivo deve conter cabeçalho válido.
+ *
+ * @post Nó inserido no arquivo, cabeçalho atualizado.
+ */
+int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+
+        if (no_arvore == NULL) return ERRO_NO_NULO;
+
+        CABECALHO* cabecalho = le_cabecalho(arquivo);
+        if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
+
+        if (cabecalho->livre != POSICAO_INVALIDA) {
+                NO_ARVORE* no_livre = ler_no_arquivo(arquivo, cabecalho->livre);
+                if (no_livre == NULL) {
+                        free(cabecalho);
+                        return ERRO_NO_NULO;
+                }
+
+                int r = escrever_no(arquivo, no_arvore, cabecalho->livre);
+                if (r != SUCESSO) {
+                        free(cabecalho);
+                        free(no_livre);
+                        return r;
+                }
+
+                cabecalho->livre = no_livre->filho_esquerdo;
+                free(no_livre);
+        } else {
+                int r = escrever_no(arquivo, no_arvore, cabecalho->topo);
+                if (r != SUCESSO) {
+                        free(cabecalho);
+                        return r;
+                }
+
+                cabecalho->topo++;
+        }
+
+        cabecalho->quantidade_livros++;
+        int r = escreve_cabecalho(arquivo, cabecalho);
+        if (r != SUCESSO) {
+                free(cabecalho);
+                return r;
+        }
+
+        free(cabecalho);
+
+        return SUCESSO;
+}
+
+/**
+ * @brief Remove um nó da árvore no arquivo e o adiciona à lista livre.
+ *
+ * Marca a posição como livre, atualiza os campos do nó removido e ajusta
+ * a lista livre no cabeçalho. Decrementa a quantidade de livros.
+ *
+ * @param[in,out] arquivo Ponteiro para arquivo aberto para leitura e escrita.
+ * @param[in] posicao Índice do nó a ser removido.
+ * @return Código de retorno: SUCESSO (0) ou erro específico.
+ *
+ * @pre `arquivo` não pode ser NULL.
+ * @pre `posicao` deve ser válida e existir no arquivo.
+ *
+ * @post Nó removido é marcado como livre e lista livre atualizada no cabeçalho.
+ */
+int remover_no_arquivo(FILE* arquivo, const int posicao) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+
+        CABECALHO* cabecalho = le_cabecalho(arquivo);
+        if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
+
+        NO_ARVORE* no_removido = ler_no_arquivo(arquivo, posicao);
+        if (no_removido == NULL) {
+                free(cabecalho);
+                return ERRO_NO_NULO;
+        }
+
+        memset(&no_removido->livro, 0, sizeof(LIVRO));
+        no_removido->filho_direito = POSICAO_INVALIDA;
+        no_removido->filho_esquerdo = cabecalho->livre;
+
+        cabecalho->livre = posicao;
+        cabecalho->quantidade_livros--;
+
+        int r = escrever_no(arquivo, no_removido, posicao);
+        if (r != SUCESSO) {
+                free(cabecalho);
+                free(no_removido);
+                return r;
+        }
+
+        r = escreve_cabecalho(arquivo, cabecalho);
+        if (r != SUCESSO) {
+                free(cabecalho);
+                free(no_removido);
+                return r;
+        }
+
+        free(cabecalho);
+        free(no_removido);
 
         return SUCESSO;
 }
