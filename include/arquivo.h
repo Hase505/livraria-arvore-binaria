@@ -78,6 +78,24 @@ CABECALHO* le_cabecalho(FILE* arquivo);
 int escreve_cabecalho(FILE* arquivo, const CABECALHO* cabecalho);
 
 /**
+ * @brief Escreve um nó da árvore na posição especificada do arquivo.
+ *
+ * Posiciona o ponteiro do arquivo na posição correta (após o cabeçalho) e
+ * grava o nó informado.
+ *
+ * @param[in,out] arquivo Ponteiro para arquivo aberto em modo escrita.
+ * @param[in] no Ponteiro para o nó que será escrito.
+ * @param[in] posicao Índice no arquivo onde o nó será escrito.
+ * @return Código de erro: SUCESSO (0) ou código negativo em caso de falha.
+ *
+ * @pre `arquivo` e `no` devem ser diferentes de NULL.
+ * @pre `posicao` deve ser válida (não negativa).
+ *
+ * @post O nó será escrito na posição indicada do arquivo.
+ */
+int escrever_no(FILE* arquivo, const NO_ARVORE* no, const int posicao);
+
+/**
  * @brief Insere um nó na árvore no arquivo, utilizando lista livre se disponível.
  *
  * Se existir posição livre (removida anteriormente), reutiliza-a; caso contrário,
@@ -85,14 +103,16 @@ int escreve_cabecalho(FILE* arquivo, const CABECALHO* cabecalho);
  *
  * @param[in,out] arquivo Ponteiro para arquivo aberto para leitura e escrita.
  * @param[in] no_arvore Ponteiro para o nó a ser inserido.
+ * @param[out] posicao_inserida Ponteiro utilizado para informar qual posição nó foi inserido
  * @return Código de retorno: SUCESSO (0) ou erro específico.
  *
  * @pre `arquivo` e `no_arvore` não podem ser NULL.
  * @pre Arquivo deve conter cabeçalho válido.
  *
  * @post Nó inserido no arquivo, cabeçalho atualizado.
+ * @post Valor de posicao_inserida é alterado, refletindo a posição em que o nó foi inserido
  */
-int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore);
+int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore, int* posicao_inserida);
 
 /**
  * @brief Remove um nó da árvore no arquivo e o adiciona à lista livre.
