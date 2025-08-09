@@ -118,7 +118,7 @@ NO_ARVORE* ler_no_arquivo(FILE* arquivo, const int posicao) {
  *
  * @post O nó será escrito na posição indicada do arquivo.
  */
-static int escrever_no(FILE* arquivo, const NO_ARVORE* no, const int posicao) {
+int escrever_no(FILE* arquivo, const NO_ARVORE* no, const int posicao) {
         if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
         if (no == NULL) return ERRO_NO_NULO;
 
@@ -137,14 +137,16 @@ static int escrever_no(FILE* arquivo, const NO_ARVORE* no, const int posicao) {
  *
  * @param[in,out] arquivo Ponteiro para arquivo aberto para leitura e escrita.
  * @param[in] no_arvore Ponteiro para o nó a ser inserido.
+ * @param[out] posicao_inserida Ponteiro utilizado para informar qual posição nó foi inserido
  * @return Código de retorno: SUCESSO (0) ou erro específico.
  *
  * @pre `arquivo` e `no_arvore` não podem ser NULL.
  * @pre Arquivo deve conter cabeçalho válido.
  *
  * @post Nó inserido no arquivo, cabeçalho atualizado.
+ * @post Valor de posicao_inserida é alterado, refletindo a posição em que o nó foi inserido
  */
-int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore) {
+int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore, int* posicao_inserida) {
         if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
 
         if (no_arvore == NULL) return ERRO_NO_NULO;
@@ -166,6 +168,8 @@ int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore) {
                         return r;
                 }
 
+                *posicao_inserida = cabecalho->livre;
+
                 cabecalho->livre = no_livre->filho_esquerdo;
                 free(no_livre);
         } else {
@@ -174,6 +178,8 @@ int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore) {
                         free(cabecalho);
                         return r;
                 }
+
+                *posicao_inserida = cabecalho->topo;
 
                 cabecalho->topo++;
         }

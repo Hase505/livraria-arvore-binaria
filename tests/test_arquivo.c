@@ -197,8 +197,11 @@ static void test_inserir_no_valido_sem_lista_livre(void** state) {
         no.filho_direito = -1;
         no.filho_esquerdo = -1;
 
-        int r = inserir_no_arquivo(arquivo, &no);
+        int posicao_inserido = -1;
+
+        int r = inserir_no_arquivo(arquivo, &no, &posicao_inserido);
         assert_int_equal(r, SUCESSO);
+        assert_int_equal(posicao_inserido, 0);
 
         CABECALHO cabecalho = {0};
         fseek(arquivo, 0, SEEK_SET);
@@ -275,8 +278,11 @@ static void test_inserir_no_valido_com_lista_livre(void** state) {
         no.filho_direito = -1;
         no.filho_esquerdo = -1;
 
-        int r = inserir_no_arquivo(arquivo, &no);
+        int posicao_inserido = -1;
+
+        int r = inserir_no_arquivo(arquivo, &no, &posicao_inserido);
         assert_int_equal(r, SUCESSO);
+        assert_int_equal(posicao_inserido, 0);
 
         CABECALHO cabecalho = {0};
         fseek(arquivo, 0, SEEK_SET);
@@ -319,7 +325,9 @@ static void test_ler_no_arquivo_valido(void** state) {
         no.livro = livro;
         no.filho_direito = -1;
         no.filho_esquerdo = -1;
-        inserir_no_arquivo(arquivo, &no);
+
+        int posicao_inserido = -1;
+        inserir_no_arquivo(arquivo, &no, &posicao_inserido);
 
         NO_ARVORE* no_lido = ler_no_arquivo(arquivo, 0);
         assert_non_null(no_lido);
@@ -341,7 +349,9 @@ static void test_remover_no_arquivo_valido(void** state) {
         no.filho_direito = -1;
         no.filho_esquerdo = -1;
 
-        inserir_no_arquivo(arquivo, &no);
+        int posicao_inserido = -1;
+
+        inserir_no_arquivo(arquivo, &no, &posicao_inserido);
         int r = remover_no_arquivo(arquivo, 0);
         assert_int_equal(r, SUCESSO);
 
