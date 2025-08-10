@@ -112,6 +112,4 @@ int buscar_no_arvore(FILE* arquivo, size_t codigo, RESULTADO_BUSCA* resultado);
  */
 int inserir_no_arvore(FILE* arquivo, NO_ARVORE* novo);
 
-int remover_no_arvore(FILE* arquivo, size_t codigo);
-
 #endif
