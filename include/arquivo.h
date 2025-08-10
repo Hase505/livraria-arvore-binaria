@@ -129,7 +129,7 @@ int inserir_no_arquivo(FILE* arquivo, const NO_ARVORE* no_arvore, int* posicao_i
  *
  * @post Nó removido é marcado como livre e lista livre atualizada no cabeçalho.
  */
-int remover_no_arquivo(FILE* arquivo, const int codigo);
+int remover_no_arquivo(FILE* arquivo, const int posicao);
 
 /**
  * @brief Lê um nó da árvore do arquivo na posição especificada.
