@@ -267,13 +267,13 @@ int imprimir_lista_livre(FILE* arquivo) {
 
         int pos = cabecalho->livre;
         printf("Lista de nós livres:\n");
-        if (pos == -1) {
+        if (pos == POSICAO_INVALIDA) {
                 printf("Nenhum nó livre disponível.\n");
                 free(cabecalho);
                 return SUCESSO;
         }
 
-        while (pos != -1) {
+        while (pos != POSICAO_INVALIDA) {
                 NO_ARVORE* no = ler_no_arquivo(arquivo, pos);
                 if (no == NULL) {
                         free(cabecalho);

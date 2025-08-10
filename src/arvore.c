@@ -334,7 +334,7 @@ int inserir_no_arvore(FILE* arquivo, NO_ARVORE* novo) {
  */
 static void imprimir_in_ordem_rec(FILE* arquivo, int pos_no) {
         if(arquivo==NULL)return;
-        if (pos_no == -1) return;
+        if (pos_no == POSICAO_INVALIDA) return;
 
         NO_ARVORE* no = ler_no_arquivo(arquivo, pos_no);
         if (no == NULL) return;
@@ -375,7 +375,7 @@ int imprimir_in_ordem(FILE* arquivo) {
         int raiz = cabecalho->raiz;
         free(cabecalho);
 
-        if (raiz == -1) {
+        if (raiz == POSICAO_INVALIDA) {
                 printf("Arvore vazia.\n");
                 return SUCESSO;
         }
