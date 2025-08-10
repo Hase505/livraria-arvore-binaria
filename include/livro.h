@@ -93,4 +93,33 @@ typedef struct {
  */
 int cadastrar_livro(FILE* arquivo, LIVRO livro);
 
+/**
+ * @brief Imprime na saída padrão os dados de um livro com base em seu código.
+ *
+ * Esta função busca um livro na árvore binária armazenada em arquivo,
+ * utilizando o código informado como chave de busca. Caso o livro seja encontrado,
+ * seus dados são exibidos no formato legível ao usuário.
+ *
+ * @param arquivo Ponteiro para o arquivo binário que contém a árvore de livros.
+ *                Deve estar aberto no modo adequado para leitura.
+ * @param codigo Código único do livro a ser localizado na árvore.
+ *
+ * @return
+ * - SUCESSO, se o livro foi encontrado e seus dados foram impressos com êxito.
+ * - ERRO_ARQUIVO_NULO, se o ponteiro de arquivo for NULL.
+ * - ERRO_LIVRO_INVALIDO, se o código não corresponder a nenhum livro armazenado.
+ *
+ * @pre O arquivo deve conter a estrutura de dados da árvore binária previamente construída.
+ * @pre A função assume que `buscar_no_arvore` preenche corretamente a estrutura RESULTADO_BUSCA.
+ *
+ * @post Caso o livro seja encontrado, `res.no` é desalocado com `free` após o uso.
+ *
+ * @note A função imprime diretamente na saída padrão (stdout),
+ *       não havendo armazenamento dos dados em outra estrutura.
+ *
+ * @warning Certifique-se de que `arquivo` está aberto e corresponde ao formato esperado,
+ *          pois inconsistências podem causar comportamento indefinido.
+ */
+int imprimir_dados(FILE* arquivo, size_t codigo);
+
 #endif
