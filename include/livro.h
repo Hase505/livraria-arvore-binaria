@@ -7,6 +7,15 @@
 #define LIVRO_H
 
 #include <stddef.h>
+#include <stdio.h>
+
+/**
+ * @brief Declaração antecipada do tipo NO_ARVORE.
+ *
+ * Usada para evitar include recursivo entre `livro.h` e `arvore.h`.
+ * Veja a definição completa em @ref NO_ARVORE "arvore.h"
+ */
+typedef struct NO_ARVORE NO_ARVORE;
 
 #define MAX_TITULO 150  //!< Tamanho máximo do campo "titulo"
 #define MAX_AUTOR 200   //!< Tamanho máximo do campo "autor"
@@ -64,5 +73,24 @@ typedef struct {
          */
         double preco;
 } LIVRO;
+
+/**
+ * @brief Cadastra um novo livro na árvore binária de busca.
+ *
+ * Esta função verifica se já existe um livro com o mesmo código no arquivo,
+ * e caso não exista, insere o novo livro na árvore binária de busca.
+ *
+ * @param arquivo Ponteiro para o arquivo binário aberto em modo leitura/escrita ("rb+").
+ * @param livro Estrutura LIVRO com todos os dados preenchidos.
+ * @return Código de retorno:
+ *         - SUCESSO: livro cadastrado com sucesso.
+ *         - ERRO_ARQUIVO_NULO: ponteiro para arquivo é nulo.
+ *         - ERRO_CODIGO_DUPLICADO: já existe livro com o mesmo código.
+ *         - Demais códigos de erro vindos de verificar_id_livro ou inserir_no_arvore.
+ *
+ * @note Esta função não fecha o arquivo. O chamador é responsável por
+ *       abrir e fechar o arquivo antes e depois da chamada.
+ */
+int cadastrar_livro(FILE* arquivo, LIVRO livro);
 
 #endif
