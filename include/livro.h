@@ -13,6 +13,14 @@
 #define MAX_EDITORA 50  //!< Tamanho máximo do campo "editora"
 
 /**
+ * @brief Declaração antecipada do tipo NO_ARVORE
+ *
+ * Usada para evitar include recursivo entre `livro.h` e `arvore.h`
+ * Veja a documentação completa em @ref NO_ARVORE "arvore.h"
+ */
+typedef struct NO_ARVORE NO_ARVORE;
+
+/**
  * Estrutura que representa um livro na árvore binária.
  */
 typedef struct {
