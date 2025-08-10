@@ -250,7 +250,6 @@ int remover_no_arquivo(FILE* arquivo, const int posicao) {
         return SUCESSO;
 }
 
-
 /**
  * @brief Imprime as posições dos nós livres disponíveis na lista livre do arquivo.
  *
@@ -288,4 +287,3 @@ int imprimir_lista_livre(FILE* arquivo) {
         free(cabecalho);
         return SUCESSO;
 }
-

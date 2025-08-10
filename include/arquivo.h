@@ -159,6 +159,4 @@ NO_ARVORE* ler_no_arquivo(FILE* arquivo, const int posicao);
  */
 int imprimir_lista_livre(FILE* arquivo);
 
-
-
 #endif  // ARQUIVO_H

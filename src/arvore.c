@@ -317,7 +317,6 @@ int inserir_no_arvore(FILE* arquivo, NO_ARVORE* novo) {
         return status;
 }
 
-
 /**
  * @brief Função recursiva auxiliar para imprimir os livros da árvore em ordem crescente (in-order).
  *
@@ -333,7 +332,7 @@ int inserir_no_arvore(FILE* arquivo, NO_ARVORE* novo) {
  * @post Imprime os dados do livro na saída padrão.
  */
 static void imprimir_in_ordem_rec(FILE* arquivo, int pos_no) {
-        if(arquivo==NULL)return;
+        if (arquivo == NULL) return;
         if (pos_no == POSICAO_INVALIDA) return;
 
         NO_ARVORE* no = ler_no_arquivo(arquivo, pos_no);
@@ -383,4 +382,3 @@ int imprimir_in_ordem(FILE* arquivo) {
         imprimir_in_ordem_rec(arquivo, raiz);
         return SUCESSO;
 }
-

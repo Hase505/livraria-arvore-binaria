@@ -129,6 +129,4 @@ int inserir_no_arvore(FILE* arquivo, NO_ARVORE* novo);
  */
 int imprimir_in_ordem(FILE* arquivo);
 
-
-
 #endif
