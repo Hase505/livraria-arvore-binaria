@@ -37,9 +37,9 @@ typedef struct NO_ARVORE {
  * @brief Indica se um nó é filho esquerdo, direito ou inválido.
  */
 typedef enum {
-    LADO_INVALIDO = -1, /**< Valor inválido para lado do filho */
-    LADO_ESQUERDO = 0,  /**< Nó é filho esquerdo */
-    LADO_DIREITO = 1    /**< Nó é filho direito */
+        LADO_INVALIDO = -1, /**< Valor inválido para lado do filho */
+        LADO_ESQUERDO = 0,  /**< Nó é filho esquerdo */
+        LADO_DIREITO = 1    /**< Nó é filho direito */
 } lado_filho;
 
 /**
@@ -50,11 +50,11 @@ typedef enum {
  * o nó pai e sua posição, e o lado do nó em relação ao pai.
  */
 typedef struct {
-    NO_ARVORE* no;       /**< Ponteiro para o nó encontrado (deve ser liberado pelo usuário) */
-    int posicao_no;      /**< Posição no arquivo do nó encontrado */
-    NO_ARVORE* pai;      /**< Ponteiro para o nó pai (pode ser NULL se o nó for raiz) */
-    int posicao_pai;     /**< Posição no arquivo do nó pai */
-    lado_filho lado;     /**< Indica se o nó é filho esquerdo ou direito do pai */
+        NO_ARVORE* no;   /**< Ponteiro para o nó encontrado (deve ser liberado pelo usuário) */
+        int posicao_no;  /**< Posição no arquivo do nó encontrado */
+        NO_ARVORE* pai;  /**< Ponteiro para o nó pai (pode ser NULL se o nó for raiz) */
+        int posicao_pai; /**< Posição no arquivo do nó pai */
+        lado_filho lado; /**< Indica se o nó é filho esquerdo ou direito do pai */
 } RESULTADO_BUSCA;
 
 /**
