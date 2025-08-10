@@ -149,4 +149,16 @@ int remover_no_arquivo(FILE* arquivo, const int posicao);
  */
 NO_ARVORE* ler_no_arquivo(FILE* arquivo, const int posicao);
 
+/**
+ * @brief Imprime as posições dos nós livres disponíveis na lista livre do arquivo.
+ *
+ * Percorre a lista encadeada de posições livres começando do campo `livre` do cabeçalho.
+ *
+ * @param arquivo Ponteiro para arquivo binário aberto para leitura.
+ * @return Código de retorno: SUCESSO ou erro.
+ */
+int imprimir_lista_livre(FILE* arquivo);
+
+
+
 #endif  // ARQUIVO_H

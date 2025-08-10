@@ -249,3 +249,43 @@ int remover_no_arquivo(FILE* arquivo, const int posicao) {
 
         return SUCESSO;
 }
+
+
+/**
+ * @brief Imprime as posições dos nós livres disponíveis na lista livre do arquivo.
+ *
+ * Percorre a lista encadeada de posições livres começando do campo `livre` do cabeçalho.
+ *
+ * @param arquivo Ponteiro para arquivo binário aberto para leitura.
+ * @return Código de retorno: SUCESSO ou erro.
+ */
+int imprimir_lista_livre(FILE* arquivo) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+
+        CABECALHO* cabecalho = le_cabecalho(arquivo);
+        if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
+
+        int pos = cabecalho->livre;
+        printf("Lista de nós livres:\n");
+        if (pos == -1) {
+                printf("Nenhum nó livre disponível.\n");
+                free(cabecalho);
+                return SUCESSO;
+        }
+
+        while (pos != -1) {
+                NO_ARVORE* no = ler_no_arquivo(arquivo, pos);
+                if (no == NULL) {
+                        free(cabecalho);
+                        return ERRO_NO_NULO;
+                }
+
+                printf("Posição livre: %d\n", pos);
+                pos = no->filho_esquerdo;  // próximo nó livre
+                free(no);
+        }
+
+        free(cabecalho);
+        return SUCESSO;
+}
+

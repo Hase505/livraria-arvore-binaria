@@ -112,4 +112,40 @@ int buscar_no_arvore(FILE* arquivo, size_t codigo, RESULTADO_BUSCA* resultado);
  */
 int inserir_no_arvore(FILE* arquivo, NO_ARVORE* novo);
 
+
+/**
+ * @brief Função recursiva auxiliar para imprimir os livros da árvore em ordem crescente (in-order).
+ *
+ * Percorre a árvore binária armazenada em arquivo no modo in-order:
+ * visita recursivamente o filho esquerdo, imprime o nó atual e depois o filho direito.
+ *
+ * @param arquivo Ponteiro para o arquivo binário aberto.
+ * @param pos_no Posição (índice) do nó atual no arquivo.
+ *
+ * @pre `arquivo` deve estar aberto para leitura.
+ * @pre `pos_no` deve ser válido ou -1 indicando ausência de nó.
+ *
+ * @post Imprime os dados do livro na saída padrão.
+ */
+static void imprimir_in_ordem_rec(FILE* arquivo, int pos_no);
+
+/**
+ * @brief Imprime todos os livros da árvore binária armazenada no arquivo em ordem crescente.
+ *
+ * Esta função inicia o percurso in-order a partir da raiz da árvore, lendo
+ * o cabeçalho para obter a posição da raiz.
+ *
+ * @param arquivo Ponteiro para o arquivo binário aberto em modo leitura.
+ * @return Código de retorno:
+ *         - SUCESSO (0) se a operação ocorreu normalmente;
+ *         - ERRO_ARQUIVO_NULO se o arquivo for NULL;
+ *         - ERRO_CABECALHO_NULO se o cabeçalho não puder ser lido.
+ *
+ * @pre `arquivo` deve estar aberto para leitura.
+ * @post Os dados dos livros são impressos na saída padrão.
+ */
+int imprimir_in_ordem(FILE* arquivo);
+
+
+
 #endif
