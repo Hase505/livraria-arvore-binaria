@@ -159,4 +159,11 @@ NO_ARVORE* ler_no_arquivo(FILE* arquivo, const int posicao);
  */
 int imprimir_lista_livre(FILE* arquivo);
 
+
+void abrir_ou_criar_arquivo(const char *caminho);
+
+int inicializar_arquivo_cabecalho(FILE* arquivo);
+
+
+
 #endif  // ARQUIVO_H

@@ -29,11 +29,10 @@ void exibir_menu() {
         printf("2  - IMPRIMIR DADOS DO LIVRO\n");
         printf("3  - LISTAR TODOS OS LIVROS\n");
         printf("4  - CALCULAR TOTAL\n");
-        printf("5  - CADASTRAR USUARIO\n");
-        printf("6  - REMOVER LIVRO\n");
-        printf("7 - CARREGAR ARQUIVO\n");
-        printf("8  - IMPRIMIR LISTA DE REGISTROS LIVRES:\n");
-        printf("9  - IMPRIMIR ARVORE POR NIVEIS\n");
+        printf("5  - REMOVER LIVRO\n");
+        printf("6 - CARREGAR ARQUIVO\n");
+        printf("7  - IMPRIMIR LISTA DE REGISTROS LIVRES:\n");
+        printf("8  - IMPRIMIR ARVORE POR NIVEIS\n");
         printf("0  - SAIR\n");
         printf("========================\n");
 }
