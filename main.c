@@ -39,8 +39,10 @@ int main(void) {
 
                         case 5:
                                 status = opcao_remover_livro(CAMINHO_ARQUIVO);
-                                if (status != SUCESSO) printf("Erro ao remover livro.\n");
-                                else printf("Livro removido com sucesso\n");
+                                if (status != SUCESSO)
+                                        printf("Erro ao remover livro.\n");
+                                else
+                                        printf("Livro removido com sucesso\n");
                                 break;
                         case 6:
                                 status = opcao_carregar_txt(CAMINHO_ARQUIVO);

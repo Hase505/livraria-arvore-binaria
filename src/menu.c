@@ -296,11 +296,11 @@ int opcao_carregar_txt(const char* caminho) {
         return status;
 }
 
-int opcao_imprimir_arvore_por_niveis(const char* caminho){
+int opcao_imprimir_arvore_por_niveis(const char* caminho) {
         printf("\n Arvore por niveis: \n");
 
-        FILE* arquivo = fopen(caminho,"rb");
-        if(!arquivo) return ERRO_ARQUIVO_NULO;
+        FILE* arquivo = fopen(caminho, "rb");
+        if (!arquivo) return ERRO_ARQUIVO_NULO;
 
         int status = imprimir_arvore_por_niveis(arquivo);
 
