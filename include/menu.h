@@ -70,15 +70,6 @@ int opcao_remover_livro(char* caminho_livros);
 int opcao_imprimir_lista_livre(const char* caminho);
 
 /**
- * @brief Função auxiliar que lê um arquivo texto já aberto e cadastra os livros no arquivo binário.
- *
- * @param txt Ponteiro para o arquivo texto aberto para leitura.
- * @param arq_bin Ponteiro para o arquivo binário aberto para leitura/escrita.
- * @return int Código de status da operação.
- */
-static int ler_txt(FILE* txt, FILE* arq_bin);
-
-/**
  * @brief Abre o arquivo texto, solicita o nome ao usuário e chama a função para carregar os livros
  * no arquivo binário.
  *

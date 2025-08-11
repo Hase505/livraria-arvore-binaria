@@ -93,7 +93,7 @@ int opcao_cadastrar_livro(char* caminho_livros) {
         if ((resposta = cadastrar_livro(arquivo, livro)) != SUCESSO) {
                 printf("\nErro ao cadastrar livro");
                 if (resposta == ERRO_CODIGO_DUPLICADO)
-                        printf(": Livro com codigo ja cadastrado\n");
+                        printf("\n: Livro com codigo ja cadastrado\n");
                 else
                         printf("\n");
                 fclose(arquivo);
