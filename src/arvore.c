@@ -66,62 +66,6 @@ static int buscar_no_minimo(FILE* arquivo, int posicao_inicial, RESULTADO_BUSCA*
 }
 
 /**
- * @brief Busca o nó com o maior valor a partir de uma posição inicial na árvore.
- *
- * Percorre a árvore binária de busca (armazenada em arquivo) a partir de uma posição inicial,
- * sempre seguindo para o filho à direita até encontrar o nó mais à direita (máximo).
- * Preenche a estrutura RESULTADO_BUSCA com o nó encontrado, seu pai e as posições correspondentes.
- *
- * @param arquivo Ponteiro para o arquivo que contém a árvore.
- * @param posicao_inicial Posição do nó inicial para a busca.
- * @param resultado Ponteiro para estrutura RESULTADO_BUSCA onde o resultado será armazenado.
- *
- * @return SUCESSO se encontrou o nó máximo.
- * @return ERRO_ARQUIVO_NULO se o ponteiro para o arquivo for nulo.
- * @return ERRO_NO_NULO se a posição inicial for inválida ou se ocorrer erro ao ler um nó.
- */
-static int buscar_no_maximo(FILE* arquivo, int posicao_inicial, RESULTADO_BUSCA* resultado) {
-        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
-        if (posicao_inicial == POSICAO_INVALIDA) return ERRO_NO_NULO;
-
-        int posicao_atual = posicao_inicial;
-        NO_ARVORE* no_atual = NULL;
-        NO_ARVORE* no_pai = NULL;
-        int posicao_pai = POSICAO_INVALIDA;
-        int lado = LADO_INVALIDO;
-
-        while (posicao_atual != POSICAO_INVALIDA) {
-                NO_ARVORE* no_lido = ler_no_arquivo(arquivo, posicao_atual);
-                if (no_lido == NULL) {
-                        free(no_atual);
-                        free(no_pai);
-                        return ERRO_NO_NULO;
-                }
-
-                if (no_lido->filho_direito == POSICAO_INVALIDA) {
-                        // Encontrou o máximo
-                        resultado->no = no_lido;
-                        resultado->posicao_no = posicao_atual;
-                        resultado->pai = no_pai;
-                        resultado->posicao_pai = posicao_pai;
-                        resultado->lado = lado;
-                        return SUCESSO;
-                }
-
-                // Avança para a direita
-                free(no_pai);
-                no_pai = no_atual;
-                posicao_pai = posicao_atual;
-                lado = LADO_DIREITO;
-
-                no_atual = no_lido;
-                posicao_atual = no_lido->filho_direito;
-        }
-
-        return ERRO_NO_NULO;
-}
-
-/**
  * @brief Libera a memória alocada para um resultado de busca na árvore.
  *
  * Libera os ponteiros `no` e `pai` da estrutura RESULTADO_BUSCA e
@@ -455,11 +399,25 @@ static int remover_no_interno(FILE* arquivo, RESULTADO_BUSCA* resultado) {
         if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
         if (resultado == NULL) return ERRO_RESULTADO_BUSCA_NULO;
 
+        // Caso especial: nó com apenas um filho
+        if (resultado->no->filho_esquerdo == POSICAO_INVALIDA ||
+            resultado->no->filho_direito == POSICAO_INVALIDA) {
+                int filho = (resultado->no->filho_esquerdo != POSICAO_INVALIDA)
+                                ? resultado->no->filho_esquerdo
+                                : resultado->no->filho_direito;
+
+                // Libera o nó e aponta pai/raiz para o filho
+                int status = remover_no_arquivo(arquivo, resultado->posicao_no);
+                if (status != SUCESSO) return status;
+
+                return atualizar_pai_ou_raiz(arquivo, resultado, filho);
+        }
+
+        // Caso clássico: nó com dois filhos
         int status;
         RESULTADO_BUSCA res_sub = {0};
 
         if (resultado->no->filho_direito != POSICAO_INVALIDA) {
-                // Busca sucessor
                 status = buscar_no_minimo(arquivo, resultado->no->filho_direito, &res_sub);
                 if (status != SUCESSO) {
                         liberar_resultado_busca(&res_sub);
@@ -474,32 +432,6 @@ static int remover_no_interno(FILE* arquivo, RESULTADO_BUSCA* resultado) {
                 }
 
                 int pos_filho_substituto = res_sub.no->filho_direito;
-                status = atualizar_pai_ou_raiz(arquivo, &res_sub, pos_filho_substituto);
-                if (status != SUCESSO) {
-                        liberar_resultado_busca(&res_sub);
-                        return status;
-                }
-
-                status = remover_no_arquivo(arquivo, res_sub.posicao_no);
-                liberar_resultado_busca(&res_sub);
-                return status;
-
-        } else if (resultado->no->filho_esquerdo != POSICAO_INVALIDA) {
-                // Busca antecessor
-                status = buscar_no_maximo(arquivo, resultado->no->filho_esquerdo, &res_sub);
-                if (status != SUCESSO) {
-                        liberar_resultado_busca(&res_sub);
-                        return status;
-                }
-
-                resultado->no->livro = res_sub.no->livro;
-                status = escrever_no(arquivo, resultado->no, resultado->posicao_no);
-                if (status != SUCESSO) {
-                        liberar_resultado_busca(&res_sub);
-                        return status;
-                }
-
-                int pos_filho_substituto = res_sub.no->filho_esquerdo;
                 status = atualizar_pai_ou_raiz(arquivo, &res_sub, pos_filho_substituto);
                 if (status != SUCESSO) {
                         liberar_resultado_busca(&res_sub);
