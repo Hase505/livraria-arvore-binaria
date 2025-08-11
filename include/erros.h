@@ -24,7 +24,8 @@ typedef enum {
         ERRO_CODIGO_DUPLICADO = -21,     /**< Já existe um nó com o código informado. */
         ERRO_RESULTADO_BUSCA_NULO = -22, /**< Estrutura RESULTADO_BUSCA é nulo. */
 
-        ERRO_LIVRO_INVALIDO = -30, /**< Não existe um nó com o livro buscado. */
+        ERRO_LIVRO_INVALIDO = -30,  /**< Não existe um nó com o livro buscado. */
+        ERRO_CADASTRAR_LIVRO = -31, /**< erro na tentativa de cadastrar livro na biblioteca. */
 
         ERRO_FILA_NULA = -40,
         ERRO_ITEM_FILA_NULO = -41,
