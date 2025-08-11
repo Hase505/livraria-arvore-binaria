@@ -289,7 +289,8 @@ int imprimir_lista_livre(FILE* arquivo) {
 }
 
 /**
- * @brief Inicializa o cabeçalho do arquivo binário se ele estiver vazio ou menor que o tamanho do cabeçalho.
+ * @brief Inicializa o cabeçalho do arquivo binário se ele estiver vazio ou menor que o tamanho do
+ * cabeçalho.
  *
  * Esta função verifica o tamanho do arquivo e, caso ele seja menor que o tamanho da estrutura
  * CABECALHO, inicializa o arquivo escrevendo uma estrutura CABECALHO zerada com valores padrão.
@@ -336,13 +337,12 @@ int inicializar_arquivo_cabecalho(FILE* arquivo) {
         return SUCESSO;
 }
 
-
 /**
- * @brief Abre um arquivo binário existente para leitura e escrita ou cria um novo arquivo caso não exista,
- *        inicializando seu cabeçalho.
+ * @brief Abre um arquivo binário existente para leitura e escrita ou cria um novo arquivo caso não
+ * exista, inicializando seu cabeçalho.
  *
- * Esta função tenta abrir o arquivo no modo "rb+" (leitura e escrita binária). Se o arquivo não existir,
- * ele é criado no modo "wb+". Após abrir/criar, o cabeçalho do arquivo é inicializado.
+ * Esta função tenta abrir o arquivo no modo "rb+" (leitura e escrita binária). Se o arquivo não
+ * existir, ele é criado no modo "wb+". Após abrir/criar, o cabeçalho do arquivo é inicializado.
  *
  * @param caminho Caminho do arquivo binário a ser aberto ou criado.
  *

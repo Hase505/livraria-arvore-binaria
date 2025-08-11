@@ -78,7 +78,6 @@ int opcao_imprimir_lista_livre(const char* caminho);
  */
 int opcao_carregar_txt(const char* caminho);
 
-
 /**
  * @brief Abre o arquivo binário e imprime a árvore binária por níveis.
  *

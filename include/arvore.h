@@ -140,8 +140,6 @@ int imprimir_in_ordem(FILE* arquivo);
  */
 int remover_no_arvore(FILE* arquivo, size_t codigo);
 
-
-
 /**
  * @brief Imprime a árvore binária armazenada em arquivo por níveis (ordem por largura).
  *
@@ -158,8 +156,8 @@ int remover_no_arvore(FILE* arquivo, size_t codigo);
  *         - ERRO_NO_NULO: erro ao ler nó da árvore no arquivo.
  *
  * @pre O arquivo deve conter uma árvore binária previamente construída e um cabeçalho válido.
- * @pre Funções auxiliares como criar_fila, enfileirar, desenfileirar, destruir_fila e ler_no_arquivo
- *      devem estar implementadas e funcionando corretamente.
+ * @pre Funções auxiliares como criar_fila, enfileirar, desenfileirar, destruir_fila e
+ * ler_no_arquivo devem estar implementadas e funcionando corretamente.
  *
  * @post A função imprime no stdout os códigos dos livros da árvore, um nível por linha.
  *
