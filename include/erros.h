@@ -20,8 +20,9 @@ typedef enum {
 
         ERRO_CABECALHO_NULO = -10, /**< Cabeçalho não encontrado no arquivo binário. */
 
-        ERRO_NO_NULO = -20,          /**< Nó da árvore é nulo. */
-        ERRO_CODIGO_DUPLICADO = -21, /**< Já existe um nó com o código informado. */
+        ERRO_NO_NULO = -20,              /**< Nó da árvore é nulo. */
+        ERRO_CODIGO_DUPLICADO = -21,     /**< Já existe um nó com o código informado. */
+        ERRO_RESULTADO_BUSCA_NULO = -22, /**< Estrutura RESULTADO_BUSCA é nulo. */
 
         ERRO_LIVRO_INVALIDO = -30 /**< Não existe um nó com o livro buscado. */
 } codigo_erro;

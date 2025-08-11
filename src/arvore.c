@@ -382,3 +382,175 @@ int imprimir_in_ordem(FILE* arquivo) {
         imprimir_in_ordem_rec(arquivo, raiz);
         return SUCESSO;
 }
+
+/**
+ * @brief Atualiza o ponteiro do pai ou raiz para um novo filho.
+ *
+ * Caso o nó não tenha pai (seja a raiz), atualiza o campo `raiz` no cabeçalho
+ * do arquivo. Caso tenha pai, atualiza o ponteiro esquerdo ou direito do pai.
+ *
+ * @param arquivo Ponteiro para o arquivo da árvore.
+ * @param resultado Estrutura contendo informações do nó a ser atualizado.
+ * @param posicao_filho Posição do novo filho (ou POSICAO_INVALIDA).
+ * @return int Código de status da operação.
+ */
+static int atualizar_pai_ou_raiz(FILE* arquivo, RESULTADO_BUSCA* resultado, int posicao_filho) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+        if (resultado == NULL) return ERRO_RESULTADO_BUSCA_NULO;
+
+        int status;
+
+        if (resultado->pai == NULL) {  // Atualiza a raiz
+                CABECALHO* cabecalho = le_cabecalho(arquivo);
+                if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
+
+                cabecalho->raiz = posicao_filho;
+                status = escreve_cabecalho(arquivo, cabecalho);
+
+                free(cabecalho);
+                return status;
+        } else {  // Atualiza ponteiro do pai
+                if (resultado->lado == LADO_ESQUERDO)
+                        resultado->pai->filho_esquerdo = posicao_filho;
+                else if (resultado->lado == LADO_DIREITO)
+                        resultado->pai->filho_direito = posicao_filho;
+                else
+                        return ERRO_NO_NULO;
+
+                return escrever_no(arquivo, resultado->pai, resultado->posicao_pai);
+        }
+}
+
+/**
+ * @brief Remove um nó folha da árvore.
+ *
+ * Atualiza o ponteiro do pai ou raiz para POSICAO_INVALIDA e libera o nó no arquivo.
+ *
+ * @param arquivo Ponteiro para o arquivo da árvore.
+ * @param resultado Estrutura contendo informações do nó a ser removido.
+ * @return int Código de status da operação.
+ */
+static int remover_no_folha(FILE* arquivo, RESULTADO_BUSCA* resultado) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+        if (resultado == NULL) return ERRO_RESULTADO_BUSCA_NULO;
+
+        int status = remover_no_arquivo(arquivo, resultado->posicao_no);
+        if (status != SUCESSO) return status;
+
+        return atualizar_pai_ou_raiz(arquivo, resultado, POSICAO_INVALIDA);
+}
+
+/**
+ * @brief Remove um nó interno da árvore, substituindo pelo sucessor ou antecessor.
+ *
+ * Caso tenha filho direito, substitui pelo nó mínimo da subárvore direita (sucessor).
+ * Caso contrário, substitui pelo nó máximo da subárvore esquerda (antecessor).
+ * O nó substituto é sempre uma folha ou nó com um único filho.
+ *
+ * @param arquivo Ponteiro para o arquivo da árvore.
+ * @param resultado Estrutura contendo informações do nó a ser removido.
+ * @return int Código de status da operação.
+ */
+static int remover_no_interno(FILE* arquivo, RESULTADO_BUSCA* resultado) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+        if (resultado == NULL) return ERRO_RESULTADO_BUSCA_NULO;
+
+        int status;
+        RESULTADO_BUSCA res_sub = {0};
+
+        if (resultado->no->filho_direito != POSICAO_INVALIDA) {
+                // Busca sucessor
+                status = buscar_no_minimo(arquivo, resultado->no->filho_direito, &res_sub);
+                if (status != SUCESSO) {
+                        liberar_resultado_busca(&res_sub);
+                        return status;
+                }
+
+                resultado->no->livro = res_sub.no->livro;
+                status = escrever_no(arquivo, resultado->no, resultado->posicao_no);
+                if (status != SUCESSO) {
+                        liberar_resultado_busca(&res_sub);
+                        return status;
+                }
+
+                int pos_filho_substituto = res_sub.no->filho_direito;
+                status = atualizar_pai_ou_raiz(arquivo, &res_sub, pos_filho_substituto);
+                if (status != SUCESSO) {
+                        liberar_resultado_busca(&res_sub);
+                        return status;
+                }
+
+                status = remover_no_arquivo(arquivo, res_sub.posicao_no);
+                liberar_resultado_busca(&res_sub);
+                return status;
+
+        } else if (resultado->no->filho_esquerdo != POSICAO_INVALIDA) {
+                // Busca antecessor
+                status = buscar_no_maximo(arquivo, resultado->no->filho_esquerdo, &res_sub);
+                if (status != SUCESSO) {
+                        liberar_resultado_busca(&res_sub);
+                        return status;
+                }
+
+                resultado->no->livro = res_sub.no->livro;
+                status = escrever_no(arquivo, resultado->no, resultado->posicao_no);
+                if (status != SUCESSO) {
+                        liberar_resultado_busca(&res_sub);
+                        return status;
+                }
+
+                int pos_filho_substituto = res_sub.no->filho_esquerdo;
+                status = atualizar_pai_ou_raiz(arquivo, &res_sub, pos_filho_substituto);
+                if (status != SUCESSO) {
+                        liberar_resultado_busca(&res_sub);
+                        return status;
+                }
+
+                status = remover_no_arquivo(arquivo, res_sub.posicao_no);
+                liberar_resultado_busca(&res_sub);
+                return status;
+        }
+
+        return ERRO_NO_NULO;
+}
+
+/**
+ * @brief Remove um nó da árvore binária de busca no arquivo.
+ *
+ * Determina se o nó é folha ou interno e chama a função apropriada.
+ *
+ * @param arquivo Ponteiro para o arquivo da árvore.
+ * @param codigo Código do livro a ser removido.
+ * @return int Código de status da operação.
+ */
+int remover_no_arvore(FILE* arquivo, size_t codigo) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+
+        CABECALHO* cabecalho = le_cabecalho(arquivo);
+        if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
+
+        if (cabecalho->raiz == POSICAO_INVALIDA) {
+                free(cabecalho);
+                return ERRO_NO_NULO;
+        }
+
+        int status;
+        RESULTADO_BUSCA resultado = {0};
+        status = buscar_no_arvore(arquivo, codigo, &resultado);
+        if (status != SUCESSO) {
+                free(cabecalho);
+                liberar_resultado_busca(&resultado);
+                return ERRO_NO_NULO;
+        }
+
+        if (resultado.no->filho_esquerdo == POSICAO_INVALIDA &&
+            resultado.no->filho_direito == POSICAO_INVALIDA) {
+                status = remover_no_folha(arquivo, &resultado);
+        } else {
+                status = remover_no_interno(arquivo, &resultado);
+        }
+
+        free(cabecalho);
+        liberar_resultado_busca(&resultado);
+        return status;
+}
