@@ -484,6 +484,29 @@ int remover_no_arvore(FILE* arquivo, size_t codigo) {
         return status;
 }
 
+/**
+ * @brief Imprime a árvore binária armazenada em arquivo por níveis (ordem por largura).
+ *
+ * Esta função realiza uma travessia em largura (level order) na árvore binária de busca,
+ * lendo os nós do arquivo e imprimindo os códigos dos livros por nível, um nível por linha.
+ *
+ * @param arquivo Ponteiro para o arquivo binário aberto em modo leitura.
+ * @return Código de status da operação:
+ *         - SUCESSO: árvore impressa com sucesso ou árvore vazia.
+ *         - ERRO_ARQUIVO_NULO: ponteiro para arquivo é NULL.
+ *         - ERRO_CABECALHO_NULO: cabeçalho não encontrado no arquivo.
+ *         - ERRO_FILA_NULA: falha ao criar fila para a travessia.
+ *         - ERRO_FILA_CHEIA: erro ao enfileirar nó na fila.
+ *         - ERRO_NO_NULO: erro ao ler nó da árvore no arquivo.
+ *
+ * @pre O arquivo deve conter uma árvore binária previamente construída e um cabeçalho válido.
+ * @pre Funções auxiliares como criar_fila, enfileirar, desenfileirar, destruir_fila e ler_no_arquivo
+ *      devem estar implementadas e funcionando corretamente.
+ *
+ * @post A função imprime no stdout os códigos dos livros da árvore, um nível por linha.
+ *
+ * @note Caso a árvore esteja vazia (raiz inválida), a função retorna SUCESSO sem imprimir nada.
+ */
 int imprimir_arvore_por_niveis(FILE* arquivo) {
         if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
 

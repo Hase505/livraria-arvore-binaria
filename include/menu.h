@@ -78,6 +78,21 @@ int opcao_imprimir_lista_livre(const char* caminho);
  */
 int opcao_carregar_txt(const char* caminho);
 
+
+/**
+ * @brief Abre o arquivo binário e imprime a árvore binária por níveis.
+ *
+ * Esta função abre o arquivo de livros no caminho informado, chama a função
+ * que imprime a árvore por níveis e fecha o arquivo após a operação.
+ *
+ * @param caminho Caminho do arquivo binário contendo a árvore de livros.
+ * @return Código de status da operação:
+ *         - SUCESSO: árvore impressa com sucesso.
+ *         - ERRO_ARQUIVO_NULO: falha ao abrir o arquivo.
+ *         - Códigos de erro retornados por imprimir_arvore_por_niveis.
+ *
+ * @note A função imprime diretamente no stdout.
+ */
 int opcao_imprimir_arvore_por_niveis(const char* caminho);
 
 #endif  // MENU_H
