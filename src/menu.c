@@ -1,6 +1,5 @@
 #include "../include/menu.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +23,7 @@ void limpar_enter(char* str) {
  * @brief Exibe o menu principal com as opções do sistema.
  */
 void exibir_menu() {
-        printf("\n====MENU PRINCIPAL====\n");
+        printf("====MENU PRINCIPAL====\n");
         printf("1  - CADASTRAR LIVRO\n");
         printf("2  - IMPRIMIR DADOS DO LIVRO\n");
         printf("3  - LISTAR TODOS OS LIVROS\n");
@@ -46,44 +45,52 @@ void exibir_menu() {
 int opcao_cadastrar_livro(char* caminho_livros) {
         LIVRO livro = {0};
 
-        printf("\nCodigo do livro: ");
+        printf("Codigo do livro: ");
         while ((livro.codigo = ler_size_t()) <= 0) {
-                printf("Codigo invalido (deve ser um numero maior que zero)\n");
+                printf("Codigo invalido (deve ser um numero maior que zero)\n\n");
                 printf("Codigo do livro: ");
         }
+        printf("\n");
 
-        printf("\nTitulo: ");
+        printf("Titulo: ");
         fgets(livro.titulo, MAX_TITULO + 1, stdin);
         limpar_enter(livro.titulo);
+        printf("\n");
 
-        printf("\nAutor: ");
+        printf("Autor: ");
         fgets(livro.autor, MAX_AUTOR + 1, stdin);
         limpar_enter(livro.autor);
+        printf("\n");
 
-        printf("\nEditora: ");
+        printf("Editora: ");
         fgets(livro.editora, MAX_EDITORA + 1, stdin);
         limpar_enter(livro.editora);
+        printf("\n");
 
-        printf("\nEdicao: ");
+        printf("Edicao: ");
         while ((livro.edicao = ler_size_t()) <= 0) {
-                printf("Edicao invalida (deve ser um numero maior que zero)\n");
+                printf("Edicao invalida (deve ser um numero maior que zero)\n\n");
                 printf("Edicao: ");
         }
+        printf("\n");
 
-        printf("\nAno: ");
+        printf("Ano: ");
         while ((livro.ano = ler_size_t()) <= 0) {
-                printf("Ano invalido (deve ser um numero maior que zero)\n");
+                printf("Ano invalido (deve ser um numero maior que zero)\n\n");
                 printf("Ano: ");
         }
+        printf("\n");
 
-        printf("\nQuantidade de exemplares: ");
-        while ((livro.exemplares = ler_size_t()) <= 0) {
-                printf("Digite um valor valido (nao negativo)\n");
+        printf("Quantidade de exemplares: ");
+        while (!ler_size_t_com_zero(&livro.exemplares)) {
+                printf("Digite um valor valido (nao negativo)\n\n");
                 printf("Quantidade de exemplares: ");
         }
+        printf("\n");
 
-        printf("\nPreco: ");
+        printf("Preco: ");
         livro.preco = ler_double();
+        printf("\n");
 
         int resposta;
         FILE* arquivo = fopen(caminho_livros, "rb+");
@@ -91,15 +98,16 @@ int opcao_cadastrar_livro(char* caminho_livros) {
                 return ERRO_ARQUIVO_NULO;
         }
         if ((resposta = cadastrar_livro(arquivo, livro)) != SUCESSO) {
-                printf("\nErro ao cadastrar livro");
+                printf("Erro ao cadastrar livro");
                 if (resposta == ERRO_CODIGO_DUPLICADO)
-                        printf("\n: Livro com codigo ja cadastrado\n");
+                        printf(": Livro com codigo ja cadastrado\n");
                 else
                         printf("\n");
+                printf("\n");
                 fclose(arquivo);
                 return ERRO_CADASTRAR_LIVRO;
         } else {
-                printf("\nLivro \"%s\" cadastrado com sucesso!\n", livro.titulo);
+                printf("Livro \"%s\" cadastrado com sucesso!\n\n", livro.titulo);
                 fclose(arquivo);
                 return SUCESSO;
         }
@@ -112,13 +120,18 @@ int opcao_cadastrar_livro(char* caminho_livros) {
  * @return int Código de status da operação (SUCESSO ou erro).
  */
 int opcao_imprimir_dados(char* caminho_livros) {
+        printf("Insira o codigo do livro: ");
         size_t codigo = ler_size_t();
+        printf("\n");
 
         FILE* arquivo = fopen(caminho_livros, "rb");
         if (!arquivo) return ERRO_ARQUIVO_NULO;
-        printf("\n");
+
         int status = imprimir_dados(arquivo, codigo);
         fclose(arquivo);
+
+        printf("\n");
+
         return status;
 }
 
@@ -134,6 +147,7 @@ int opcao_listar_todos(char* caminho_livros) {
 
         int status = imprimir_in_ordem(arquivo);
         fclose(arquivo);
+
         return status;
 }
 
@@ -146,14 +160,20 @@ int opcao_listar_todos(char* caminho_livros) {
 int opcao_calcular_total(char* caminho_livros) {
         FILE* arquivo = fopen(caminho_livros, "rb");
         if (!arquivo) return ERRO_ARQUIVO_NULO;
+
         CABECALHO* cab = le_cabecalho(arquivo);
         if (!cab) {
                 fclose(arquivo);
                 return ERRO_CABECALHO_NULO;
         }
-        printf("\nTotal de livros cadastrados: %zu\n", cab->quantidade_livros);
+
+        printf("Total de livros cadastrados: %zu\n", cab->quantidade_livros);
+
         free(cab);
         fclose(arquivo);
+
+        printf("\n");
+
         return SUCESSO;
 }
 
@@ -164,7 +184,7 @@ int opcao_calcular_total(char* caminho_livros) {
  * @return int Código de status da operação.
  */
 int opcao_remover_livro(char* caminho_livros) {
-        printf("\nCodigo do livro a remover: ");
+        printf("Codigo do livro a remover: ");
         size_t codigo = ler_size_t();
 
         FILE* arquivo = fopen(caminho_livros, "rb+");
@@ -172,6 +192,9 @@ int opcao_remover_livro(char* caminho_livros) {
 
         int status = remover_no_arvore(arquivo, codigo);
         fclose(arquivo);
+
+        printf("\n");
+
         return status;
 }
 
@@ -187,8 +210,14 @@ int opcao_imprimir_lista_livre(const char* caminho) {
                 printf("Erro ao abrir arquivo\n");
                 return ERRO_ARQUIVO_NULO;
         }
+
+        printf("Lista de nós livres: \n\n");
         int r = imprimir_lista_livre(arq);
+
         fclose(arq);
+
+        printf("\n");
+
         return r;
 }
 
@@ -256,10 +285,11 @@ static int ler_txt(FILE* txt, FILE* arq_bin) {
                 livro.preco = strtod(preco_str, NULL);
 
                 if (cadastrar_livro(arq_bin, livro) != SUCESSO) {
-                        printf("\nERRO AO CADASTRAR LIVRO (codigo %zu)\n", livro.codigo);
+                        printf("ERRO AO CADASTRAR LIVRO (codigo %zu)\n", livro.codigo);
                 }
         }
-        printf("\nOperacao de leitura de arquivo texto concluida!\n");
+        printf("Operacao de leitura de arquivo texto concluida!\n");
+
         return SUCESSO;
 }
 
@@ -276,15 +306,15 @@ int opcao_carregar_txt(const char* caminho) {
         if (!fgets(nome_arquivo, sizeof(nome_arquivo), stdin)) return ERRO_ARQUIVO_TEXTO;
         nome_arquivo[strcspn(nome_arquivo, "\n")] = '\0';
 
+        printf("\n");
+
         FILE* txt = fopen(nome_arquivo, "r");
         if (!txt) {
-                printf("Erro ao abrir arquivo texto\n");
                 return ERRO_ARQUIVO_NULO;
         }
 
         FILE* arq_bin = fopen(caminho, "rb+");
         if (!arq_bin) {
-                printf("Erro ao abrir arquivo binário\n");
                 fclose(txt);
                 return ERRO_ARQUIVO_NULO;
         }
@@ -293,6 +323,9 @@ int opcao_carregar_txt(const char* caminho) {
 
         fclose(txt);
         fclose(arq_bin);
+
+        printf("\n");
+
         return status;
 }
 
@@ -311,7 +344,7 @@ int opcao_carregar_txt(const char* caminho) {
  * @note A função imprime diretamente no stdout.
  */
 int opcao_imprimir_arvore_por_niveis(const char* caminho) {
-        printf("\n Arvore por niveis: \n");
+        printf("Arvore por niveis: \n\n");
 
         FILE* arquivo = fopen(caminho, "rb");
         if (!arquivo) return ERRO_ARQUIVO_NULO;
@@ -319,5 +352,8 @@ int opcao_imprimir_arvore_por_niveis(const char* caminho) {
         int status = imprimir_arvore_por_niveis(arquivo);
 
         fclose(arquivo);
+
+        printf("\n");
+
         return status;
 }

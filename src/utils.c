@@ -8,17 +8,29 @@
 #include <ctype.h>
 #include <errno.h>
 #include <float.h>
-#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/arquivo.h"
-#include "../include/arvore.h"
-#include "../include/erros.h"
-#include "../include/livro.h"
-#include "../include/menu.h"
+/**
+ * @brief Limpa a tela do terminal.
+ *
+ * Esta função limpa a tela do terminal de forma portátil,
+ * suportando sistemas operacionais Windows e Unix-like (Linux, macOS).
+ *
+ * Utiliza o comando "cls" no Windows e "clear" em sistemas Unix-like,
+ * executando via a função system().
+ *
+ * @note O uso de system() pode ter implicações de segurança se usado com entradas não confiáveis.
+ */
+void limpar_tela(void) {
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+}
 
 /**
  * @brief Verifica se o restante da string após conversão numérica contém apenas espaços ou fim de
@@ -44,36 +56,88 @@ size_t ler_size_t(void) {
         char* endptr;
         unsigned long long valor;
 
-        while (1) {
-                if (!fgets(buffer, sizeof(buffer), stdin)) {
-                        fprintf(stderr, "Erro de leitura.\n");
-                        exit(EXIT_FAILURE);
-                }
-
-                errno = 0;
-                valor = strtoull(buffer, &endptr, 10);  // base 10
-
-                if (errno == ERANGE || valor > SIZE_MAX) {
-                        printf("Número fora do intervalo de size_t.\n");
-                        continue;
-                }
-
-                if (endptr == buffer) {
-                        printf("Entrada inválida. Tente novamente.\n");
-                        continue;
-                }
-
-                while (isspace((unsigned char)*endptr)) {
-                        endptr++;
-                }
-
-                if (*endptr != '\0' && *endptr != '\n') {
-                        printf("Entrada contém caracteres inválidos.\n");
-                        continue;
-                }
-
-                return (size_t)valor;
+        if (!fgets(buffer, sizeof(buffer), stdin)) {
+                fprintf(stderr, "Erro de leitura.\n");
+                exit(EXIT_FAILURE);
         }
+
+        // Se for negativo, retorna 0
+        if (buffer[0] == '-') {
+                return 0;
+        }
+
+        errno = 0;
+        valor = strtoull(buffer, &endptr, 10);
+
+        if (errno == ERANGE || valor > SIZE_MAX) {
+                return 0;
+        }
+
+        if (endptr == buffer) {
+                return 0;
+        }
+
+        while (isspace((unsigned char)*endptr)) {
+                endptr++;
+        }
+
+        if (*endptr != '\0' && *endptr != '\n') {
+                return 0;
+        }
+
+        return (size_t)valor;
+}
+
+/**
+ * @brief Lê um valor do tipo size_t da entrada padrão de forma segura e validada.
+ *
+ * Esta função lê uma linha da entrada padrão, remove o caractere de nova linha,
+ * verifica se o conteúdo é um número inteiro não negativo válido (incluindo zero),
+ * e converte para size_t.
+ *
+ * A função rejeita números negativos, entradas inválidas (letras, símbolos, etc),
+ * valores que excedam o máximo permitido para size_t e retorna sucesso ou falha.
+ *
+ * @param saida Ponteiro para size_t onde será armazenado o valor lido.
+ * @return int Retorna 1 se a leitura e conversão foram bem-sucedidas,
+ *             ou 0 se ocorreu algum erro ou valor inválido.
+ */
+int ler_size_t_com_zero(size_t* saida) {
+        char buffer[64];
+        char* endptr;
+        unsigned long long valor;
+
+        if (!fgets(buffer, sizeof(buffer), stdin)) {
+                return 0;  // erro de leitura
+        }
+
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        if (buffer[0] == '-') {
+                return 0;  // rejeita número negativo
+        }
+
+        errno = 0;
+        valor = strtoull(buffer, &endptr, 10);
+
+        if (endptr == buffer || errno == ERANGE) {
+                return 0;  // erro na conversão
+        }
+
+        while (isspace((unsigned char)*endptr)) {
+                endptr++;
+        }
+
+        if (*endptr != '\0') {
+                return 0;  // caracteres inválidos após número
+        }
+
+        if (valor > SIZE_MAX) {
+                return 0;  // valor maior que size_t máximo
+        }
+
+        *saida = (size_t)valor;
+        return 1;  // sucesso
 }
 
 /**

@@ -265,7 +265,6 @@ int imprimir_lista_livre(FILE* arquivo) {
         if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
 
         int pos = cabecalho->livre;
-        printf("Lista de nós livres:\n");
         if (pos == POSICAO_INVALIDA) {
                 printf("Nenhum nó livre disponível.\n");
                 free(cabecalho);
