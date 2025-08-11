@@ -53,12 +53,3 @@ dkms.conf
 
 # debug information files
 *.dwo
-arvore-binaria
-.gitignore
-livros.bin
-testeprobiblioteco.txt
-include/menu.h
-lote1.txt
-lote3.txt
-lote2.txt
-lote.txt
