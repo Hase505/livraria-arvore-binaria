@@ -7,6 +7,7 @@
 
 #include "../include/arquivo.h"
 #include "../include/erros.h"
+#include "../include/fila.h"
 #include "../include/livro.h"
 
 /**
@@ -485,4 +486,62 @@ int remover_no_arvore(FILE* arquivo, size_t codigo) {
         free(cabecalho);
         liberar_resultado_busca(&resultado);
         return status;
+}
+
+int imprimir_arvore_por_niveis(FILE* arquivo) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+
+        CABECALHO* cabecalho = le_cabecalho(arquivo);
+        if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
+
+        if (cabecalho->raiz == POSICAO_INVALIDA) {
+                free(cabecalho);
+                return SUCESSO;  // árvore vazia
+        }
+
+        FILA* fila = criar_fila();
+        if (fila == NULL) {
+                free(cabecalho);
+                return ERRO_FILA_NULA;
+        }
+
+        if (enfileirar(fila, cabecalho->raiz, 0) != SUCESSO) {
+                destruir_fila(fila);
+                free(cabecalho);
+                return ERRO_FILA_CHEIA;
+        }
+
+        int nivel_atual = 0;
+
+        while (!fila_vazia(fila)) {
+                ITEM_FILA item = desenfileirar(fila);
+                if (item.posicao == -1) break;  // fila vazia, segurança
+
+                NO_ARVORE* no = ler_no_arquivo(arquivo, item.posicao);
+                if (no == NULL) {
+                        destruir_fila(fila);
+                        free(cabecalho);
+                        return ERRO_NO_NULO;
+                }
+
+                if (item.nivel != nivel_atual) {
+                        printf("\n");
+                        nivel_atual = item.nivel;
+                }
+
+                printf("%zu ", no->livro.codigo);
+
+                if (no->filho_esquerdo != POSICAO_INVALIDA)
+                        enfileirar(fila, no->filho_esquerdo, item.nivel + 1);
+
+                if (no->filho_direito != POSICAO_INVALIDA)
+                        enfileirar(fila, no->filho_direito, item.nivel + 1);
+
+                free(no);
+        }
+
+        printf("\n");
+        destruir_fila(fila);
+        free(cabecalho);
+        return SUCESSO;
 }

@@ -140,4 +140,6 @@ int imprimir_in_ordem(FILE* arquivo);
  */
 int remover_no_arvore(FILE* arquivo, size_t codigo);
 
+int imprimir_arvore_por_niveis(FILE* arquivo);
+
 #endif
