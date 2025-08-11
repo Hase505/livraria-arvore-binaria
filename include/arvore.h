@@ -129,4 +129,15 @@ int inserir_no_arvore(FILE* arquivo, NO_ARVORE* novo);
  */
 int imprimir_in_ordem(FILE* arquivo);
 
+/**
+ * @brief Remove um nó da árvore binária de busca no arquivo.
+ *
+ * Determina se o nó é folha ou interno e chama a função apropriada.
+ *
+ * @param arquivo Ponteiro para o arquivo da árvore.
+ * @param codigo Código do livro a ser removido.
+ * @return int Código de status da operação.
+ */
+int remover_no_arvore(FILE* arquivo, size_t codigo);
+
 #endif
