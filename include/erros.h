@@ -17,6 +17,7 @@ typedef enum {
         ERRO_ARQUIVO_SEEK = -2,  /**< Erro na função fseek. */
         ERRO_ARQUIVO_READ = -3,  /**< Erro na função fread. */
         ERRO_ARQUIVO_WRITE = -4, /**< Erro na função fwrite. */
+        ERRO_ARQUIVO_TEXTO = -5, /**< Caminho para arquivo texto invalido. */
 
         ERRO_CABECALHO_NULO = -10, /**< Cabeçalho não encontrado no arquivo binário. */
 

@@ -11,11 +11,18 @@
 #include "../include/livro.h"
 #include "../include/utils.h"
 
-
+/**
+ * @brief Remove o caractere de nova linha '\n' do final da string.
+ *
+ * @param str String que terá o '\n' removido.
+ */
 void limpar_enter(char* str) {
         str[strcspn(str, "\n")] = '\0';
 }
 
+/**
+ * @brief Exibe o menu principal com as opções do sistema.
+ */
 void exibir_menu() {
         printf("\n====MENU PRINCIPAL====\n");
         printf("1  - CADASTRAR LIVRO\n");
@@ -31,6 +38,12 @@ void exibir_menu() {
         printf("========================\n");
 }
 
+/**
+ * @brief Realiza o cadastro de um livro, lendo dados do usuário e salvando no arquivo binário.
+ *
+ * @param caminho_livros Caminho para o arquivo binário onde os livros estão salvos.
+ * @return int Código de status da operação (SUCESSO ou erro).
+ */
 int opcao_cadastrar_livro(char* caminho_livros) {
         LIVRO livro = {0};
 
@@ -91,4 +104,176 @@ int opcao_cadastrar_livro(char* caminho_livros) {
                 fclose(arquivo);
                 return SUCESSO;
         }
+}
+
+/**
+ * @brief Imprime os dados de um livro dado o código informado pelo usuário.
+ *
+ * @param caminho_livros Caminho do arquivo binário com os livros.
+ * @return int Código de status da operação (SUCESSO ou erro).
+ */
+int opcao_imprimir_dados(char* caminho_livros) {
+        printf("\nCodigo do livro: ");
+        size_t codigo = ler_size_t();
+
+        FILE* arquivo = fopen(caminho_livros, "rb");
+        if (!arquivo) return ERRO_ARQUIVO_NULO;
+
+        int status = imprimir_dados(arquivo, codigo);
+        fclose(arquivo);
+        return status;
+}
+
+/**
+ * @brief Lista todos os livros presentes no arquivo binário.
+ *
+ * @param caminho_livros Caminho do arquivo binário com os livros.
+ * @return int Código de status da operação.
+ */
+int opcao_listar_todos(char* caminho_livros) {
+        FILE* arquivo = fopen(caminho_livros, "rb");
+        if (!arquivo) return ERRO_ARQUIVO_NULO;
+
+        int status = imprimir_in_ordem(arquivo);
+        fclose(arquivo);
+        return status;
+}
+
+/**
+ * @brief Calcula e exibe o total de livros cadastrados no sistema.
+ *
+ * @param caminho_livros Caminho do arquivo binário com os livros.
+ * @return int Código de status da operação.
+ */
+int opcao_calcular_total(char* caminho_livros) {
+        FILE* arquivo = fopen(caminho_livros, "rb");
+        if (!arquivo) return ERRO_ARQUIVO_NULO;
+        CABECALHO* cab = le_cabecalho(arquivo);
+        if (!cab) {
+                return ERRO_CABECALHO_NULO;
+        }
+        printf("\nTotal de livros cadastrados: %zu", cab->quantidade_livros);
+        return SUCESSO;
+}
+
+/**
+ * @brief Remove um livro do sistema dado seu código.
+ *
+ * @param caminho_livros Caminho do arquivo binário com os livros.
+ * @return int Código de status da operação.
+ */
+int opcao_remover_livro(char* caminho_livros) {
+        printf("\nCodigo do livro a remover: ");
+        size_t codigo = ler_size_t();
+
+        FILE* arquivo = fopen(caminho_livros, "rb+");
+        if (!arquivo) return ERRO_ARQUIVO_NULO;
+
+        int status = remover_no_arvore(arquivo, codigo);
+        fclose(arquivo);
+        return status;
+}
+
+/**
+ * @brief Imprime a lista de registros livres do arquivo binário.
+ *
+ * @param caminho Caminho do arquivo binário.
+ * @return int Código de status da operação.
+ */
+int opcao_imprimir_lista_livre(const char* caminho) {
+        FILE* arq = fopen(caminho, "rb");
+        if (!arq) {
+                printf("Erro ao abrir arquivo");
+                return ERRO_ARQUIVO_NULO;
+        }
+        imprimir_lista_livre(arq);
+        fclose(arq);
+        return SUCESSO;
+}
+
+/**
+ * @brief Função auxiliar que lê um arquivo texto já aberto e cadastra os livros no arquivo binário.
+ *
+ * @param txt Ponteiro para o arquivo texto aberto para leitura.
+ * @param arq_bin Ponteiro para o arquivo binário aberto para leitura/escrita.
+ * @return int Código de status da operação.
+ */
+static int ler_txt(FILE* txt, FILE* arq_bin) {
+        char linha[512];
+        while (fgets(linha, sizeof(linha), txt)) {
+                LIVRO livro = {0};
+                char preco_str[50];
+                char* token = strtok(linha, ";");
+                if (!token) continue;
+                trim(token);
+                livro.codigo = (size_t)strtoull(token, NULL, 10);
+
+                token = strtok(NULL, ";");
+                if (!token) continue;
+                trim(token);
+                strncpy(livro.titulo, token, sizeof(livro.titulo));
+                livro.titulo[strcspn(livro.titulo, "\n")] = '\0';
+
+                token = strtok(NULL, ";");
+                if (!token) continue;
+                trim(token);
+                strncpy(livro.autor, token, sizeof(livro.autor));
+                livro.autor[strcspn(livro.autor, "\n")] = '\0';
+
+                token = strtok(NULL, ";");
+                if (!token) continue;
+                trim(token);
+                livro.exemplares = (size_t)strtoull(token, NULL, 10);
+                ;
+
+                token = strtok(NULL, ";");
+                if (!token) continue;
+                trim(token);
+                strncpy(preco_str, token, sizeof(preco_str));
+                for (char* p = preco_str; *p; p++) {
+                        if (*p == ',') *p = '.';
+                }
+                livro.preco = strtod(preco_str, NULL);
+
+                if (cadastrar_livro(arq_bin, livro) != SUCESSO) {
+                        printf("\nERRO AO CADASTRAR LIVRO");
+                }
+        }
+        printf("\nOperacao de leitura de arquivo texto concluida!");
+        return SUCESSO;
+}
+
+/**
+ * @brief Abre o arquivo texto, solicita o nome ao usuário e chama a função para carregar os livros
+ * no arquivo binário.
+ *
+ * @param caminho Caminho do arquivo binário para salvar os livros.
+ * @return int Código de status da operação.
+ */
+int opcao_carregar_txt(const char* caminho) {
+        char nome_arquivo[256];
+        printf("Digite o nome do arquivo texto: ");
+        if (!fgets(nome_arquivo, sizeof(nome_arquivo), stdin)) return ERRO_ARQUIVO_TEXTO;
+        nome_arquivo[strcspn(nome_arquivo, "\n")] = '\0';
+
+        FILE* txt = fopen(nome_arquivo, "r");
+        if (!txt) {
+                printf("Erro ao abrir arquivo texto\n");
+                fclose(txt);
+                return ERRO_ARQUIVO_NULO;
+        }
+
+        FILE* arq_bin = fopen(caminho, "rb+");
+        if (!arq_bin) {
+                printf("Erro ao abrir arquivo binário\n");
+                fclose(arq_bin);
+                fclose(txt);
+                return ERRO_ARQUIVO_NULO;
+        }
+
+        int status = ler_txt(txt, arq_bin);
+
+        fclose(txt);
+        fclose(arq_bin);
+        return status;
 }

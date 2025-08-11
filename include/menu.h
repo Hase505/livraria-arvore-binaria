@@ -1,7 +1,6 @@
 #ifndef MENU_H
 #define MENU_H
 
-
 #include <ctype.h>
 #include <errno.h>
 #include <float.h>
@@ -17,7 +16,87 @@
 #include "../include/livro.h"
 #include "../include/menu.h"
 
+/**
+ * @brief Remove o caractere de nova linha '\n' do final da string.
+ *
+ * @param str String que terá o '\n' removido.
+ */
+void limpar_enter(char* str);
+
+/**
+ * @brief Exibe o menu principal com as opções do sistema.
+ */
 void exibir_menu();
+
+/**
+ * @brief Exibe o menu principal com as opções do sistema.
+ */
+void exibir_menu();
+
+/**
+ * @brief Realiza o cadastro de um livro, lendo dados do usuário e salvando no arquivo binário.
+ *
+ * @param caminho_livros Caminho para o arquivo binário onde os livros estão salvos.
+ * @return int Código de status da operação (SUCESSO ou erro).
+ */
 int opcao_cadastrar_livro(char* caminho_livros);
+
+/**
+ * @brief Imprime os dados de um livro dado o código informado pelo usuário.
+ *
+ * @param caminho_livros Caminho do arquivo binário com os livros.
+ * @return int Código de status da operação (SUCESSO ou erro).
+ */
+int opcao_imprimir_dados(char* caminho_livros);
+
+/**
+ * @brief Lista todos os livros presentes no arquivo binário.
+ *
+ * @param caminho_livros Caminho do arquivo binário com os livros.
+ * @return int Código de status da operação.
+ */
+int opcao_listar_todos(char* caminho_livros);
+
+/**
+ * @brief Calcula e exibe o total de livros cadastrados no sistema.
+ *
+ * @param caminho_livros Caminho do arquivo binário com os livros.
+ * @return int Código de status da operação.
+ */
+int opcao_calcular_total(char* caminho_livros);
+
+/**
+ * @brief Remove um livro do sistema dado seu código.
+ *
+ * @param caminho_livros Caminho do arquivo binário com os livros.
+ * @return int Código de status da operação.
+ */
+int opcao_remover_livro(char* caminho_livros);
+
+/**
+ * @brief Imprime a lista de registros livres do arquivo binário.
+ *
+ * @param caminho Caminho do arquivo binário.
+ * @return int Código de status da operação.
+ */
+int opcao_imprimir_lista_livre(const char* caminho);
+
+/**
+ * @brief Função auxiliar que lê um arquivo texto já aberto e cadastra os livros no arquivo binário.
+ *
+ * @param txt Ponteiro para o arquivo texto aberto para leitura.
+ * @param arq_bin Ponteiro para o arquivo binário aberto para leitura/escrita.
+ * @return int Código de status da operação.
+ */
+static int ler_txt(FILE* txt, FILE* arq_bin);
+
+/**
+ * @brief Abre o arquivo texto, solicita o nome ao usuário e chama a função para carregar os livros
+ * no arquivo binário.
+ *
+ * @param caminho Caminho do arquivo binário para salvar os livros.
+ * @return int Código de status da operação.
+ */
+int opcao_carregar_txt(const char* caminho);
 
 #endif  // MENU_H

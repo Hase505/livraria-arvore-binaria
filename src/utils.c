@@ -1,3 +1,8 @@
+/**
+ * @file utils.c
+ * @brief Funções utilitárias para leitura segura e manipulação de strings.
+ */
+
 #include "../include/utils.h"
 
 #include <ctype.h>
@@ -15,6 +20,13 @@
 #include "../include/livro.h"
 #include "../include/menu.h"
 
+/**
+ * @brief Verifica se o restante da string após conversão numérica contém apenas espaços ou fim de
+ * linha.
+ *
+ * @param endptr Ponteiro para o caractere após a parte numérica da string.
+ * @return int Retorna 1 se o resto for válido, 0 caso contrário.
+ */
 static int resto_eh_valido(char* endptr) {
         while (isspace((unsigned char)*endptr)) {
                 endptr++;
@@ -22,6 +34,11 @@ static int resto_eh_valido(char* endptr) {
         return (*endptr == '\0' || *endptr == '\n');
 }
 
+/**
+ * @brief Lê um valor do tipo size_t da entrada padrão de forma segura e validada.
+ *
+ * @return size_t Valor lido convertido.
+ */
 size_t ler_size_t(void) {
         char buffer[100];
         char* endptr;
@@ -59,7 +76,11 @@ size_t ler_size_t(void) {
         }
 }
 
-/* ---- double ---- */
+/**
+ * @brief Lê um valor do tipo double da entrada padrão de forma segura e validada.
+ *
+ * @return double Valor lido convertido.
+ */
 double ler_double(void) {
         char buffer[128];
         char* endptr;
@@ -86,6 +107,11 @@ double ler_double(void) {
         }
 }
 
+/**
+ * @brief Remove espaços em branco no início e no fim de uma string.
+ *
+ * @param str String a ser modificada.
+ */
 void trim(char* str) {
         if (!str) return;
 
