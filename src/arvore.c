@@ -30,40 +30,36 @@ static int buscar_no_minimo(FILE* arquivo, int posicao_inicial, RESULTADO_BUSCA*
         if (posicao_inicial == POSICAO_INVALIDA) return ERRO_NO_NULO;
 
         int posicao_atual = posicao_inicial;
-        NO_ARVORE* no_atual = NULL;
-        NO_ARVORE* no_pai = NULL;
         int posicao_pai = POSICAO_INVALIDA;
+        NO_ARVORE* no_atual = ler_no_arquivo(arquivo, posicao_atual);
+        if (no_atual == NULL) return ERRO_NO_NULO;
+
+        NO_ARVORE* no_pai = NULL;
         int lado = LADO_INVALIDO;
 
-        while (posicao_atual != POSICAO_INVALIDA) {
-                NO_ARVORE* no_lido = ler_no_arquivo(arquivo, posicao_atual);
-                if (no_lido == NULL) {
-                        free(no_atual);
-                        free(no_pai);
-                        return ERRO_NO_NULO;
-                }
-
-                if (no_lido->filho_esquerdo == POSICAO_INVALIDA) {
-                        // Encontrou o mínimo
-                        resultado->no = no_lido;
-                        resultado->posicao_no = posicao_atual;
-                        resultado->pai = no_pai;
-                        resultado->posicao_pai = posicao_pai;
-                        resultado->lado = lado;
-                        return SUCESSO;
-                }
-
-                // Avança para a esquerda
-                free(no_pai);
+        while (no_atual->filho_esquerdo != POSICAO_INVALIDA) {
+                // Atualiza pai e posição pai
+                if (no_pai != NULL) free(no_pai);  // libera anterior, ok porque já não será usado
                 no_pai = no_atual;
                 posicao_pai = posicao_atual;
                 lado = LADO_ESQUERDO;
 
-                no_atual = no_lido;
-                posicao_atual = no_lido->filho_esquerdo;
+                posicao_atual = no_atual->filho_esquerdo;
+                no_atual = ler_no_arquivo(arquivo, posicao_atual);
+                if (no_atual == NULL) {
+                        if (no_pai) free(no_pai);
+                        return ERRO_NO_NULO;
+                }
         }
 
-        return ERRO_NO_NULO;
+        // Encontrou o mínimo
+        resultado->no = no_atual;
+        resultado->posicao_no = posicao_atual;
+        resultado->pai = no_pai;
+        resultado->posicao_pai = posicao_pai;
+        resultado->lado = lado;
+
+        return SUCESSO;
 }
 
 /**
