@@ -7,20 +7,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <ctype.h>
-#include <errno.h>
-#include <float.h>
-#include <limits.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "../include/arquivo.h"
-#include "../include/arvore.h"
-#include "../include/erros.h"
-#include "../include/livro.h"
-#include "../include/menu.h"
+#include <stddef.h>
 
 /**
  * @brief Lê um valor do tipo size_t da entrada padrão de forma segura e validada.

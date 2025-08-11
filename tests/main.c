@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "menu.h"   // seu arquivo de cabeçalho com as funções do menu
-#include "utils.h"  // para ler_size_t e ler_double, se precisar
+#include "../include/menu.h"   // seu arquivo de cabeçalho com as funções do menu
+#include "../include/utils.h"  // para ler_size_t e ler_double, se precisar
+#include "../include/erros.h"
+#include "../include/arquivo.h"
 
 #define CAMINHO_ARQUIVO "livros.bin"
 
