@@ -112,12 +112,11 @@ int opcao_cadastrar_livro(char* caminho_livros) {
  * @return int Código de status da operação (SUCESSO ou erro).
  */
 int opcao_imprimir_dados(char* caminho_livros) {
-        printf("\nCodigo do livro: ");
         size_t codigo = ler_size_t();
 
         FILE* arquivo = fopen(caminho_livros, "rb");
         if (!arquivo) return ERRO_ARQUIVO_NULO;
-
+        printf("\n");
         int status = imprimir_dados(arquivo, codigo);
         fclose(arquivo);
         return status;
@@ -294,5 +293,17 @@ int opcao_carregar_txt(const char* caminho) {
 
         fclose(txt);
         fclose(arq_bin);
+        return status;
+}
+
+int opcao_imprimir_arvore_por_niveis(const char* caminho){
+        printf("\n Arvore por niveis: \n");
+
+        FILE* arquivo = fopen(caminho,"rb");
+        if(!arquivo) return ERRO_ARQUIVO_NULO;
+
+        int status = imprimir_arvore_por_niveis(arquivo);
+
+        fclose(arquivo);
         return status;
 }

@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../include/arquivo.h"
-#include "../include/erros.h"
-#include "../include/menu.h"   // seu arquivo de cabeçalho com as funções do menu
-#include "../include/utils.h"  // para ler_size_t e ler_double, se precisar
+#include "include/arquivo.h"
+#include "include/erros.h"
+#include "include/menu.h"   // seu arquivo de cabeçalho com as funções do menu
+#include "include/utils.h"  // para ler_size_t e ler_double, se precisar
 
 #define CAMINHO_ARQUIVO "livros.bin"
 
@@ -52,8 +52,7 @@ int main(void) {
                                         printf("Erro ao imprimir lista de registros livres.\n");
                                 break;
                         case 8:
-                                printf(
-                                    "Funcao imprimir arvore por niveis nao implementada ainda.\n");
+                                status = opcao_imprimir_arvore_por_niveis(CAMINHO_ARQUIVO);
                                 break;
                         case 0:
                                 printf("Saindo do programa...\n");

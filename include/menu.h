@@ -78,4 +78,6 @@ int opcao_imprimir_lista_livre(const char* caminho);
  */
 int opcao_carregar_txt(const char* caminho);
 
+int opcao_imprimir_arvore_por_niveis(const char* caminho);
+
 #endif  // MENU_H
