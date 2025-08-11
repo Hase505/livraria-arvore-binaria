@@ -2,7 +2,7 @@
 #define MENU_H
 
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
 
 /**
  * @brief Remove o caractere de nova linha '\n' do final da string.

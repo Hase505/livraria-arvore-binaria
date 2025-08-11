@@ -288,52 +288,50 @@ int imprimir_lista_livre(FILE* arquivo) {
         return SUCESSO;
 }
 
-
 int inicializar_arquivo_cabecalho(FILE* arquivo) {
-    if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
 
-    // Salva posição atual
-    long pos_atual = ftell(arquivo);
-    if (pos_atual == -1L) return ERRO_ARQUIVO_NULO;
+        // Salva posição atual
+        long pos_atual = ftell(arquivo);
+        if (pos_atual == -1L) return ERRO_ARQUIVO_NULO;
 
-    // Vai até o fim para descobrir o tamanho
-    if (fseek(arquivo, 0, SEEK_END) != 0) return ERRO_ARQUIVO_SEEK;
-    long tamanho = ftell(arquivo);
-    if (tamanho == -1L) return ERRO_ARQUIVO_NULO;
+        // Vai até o fim para descobrir o tamanho
+        if (fseek(arquivo, 0, SEEK_END) != 0) return ERRO_ARQUIVO_SEEK;
+        long tamanho = ftell(arquivo);
+        if (tamanho == -1L) return ERRO_ARQUIVO_NULO;
 
-    if ((size_t)tamanho < sizeof(CABECALHO)) {
-        // Arquivo vazio ou menor que o cabeçalho: inicializa
-        CABECALHO cab = {0};
-        cab.quantidade_livros = 0;
-        cab.topo = 0;
-        cab.livre = POSICAO_INVALIDA;
-        cab.raiz = -1;
+        if ((size_t)tamanho < sizeof(CABECALHO)) {
+                // Arquivo vazio ou menor que o cabeçalho: inicializa
+                CABECALHO cab = {0};
+                cab.quantidade_livros = 0;
+                cab.topo = 0;
+                cab.livre = POSICAO_INVALIDA;
+                cab.raiz = -1;
 
-        if (fseek(arquivo, 0, SEEK_SET) != 0) return ERRO_ARQUIVO_SEEK;
+                if (fseek(arquivo, 0, SEEK_SET) != 0) return ERRO_ARQUIVO_SEEK;
 
-        if (fwrite(&cab, sizeof(CABECALHO), 1, arquivo) != 1) return ERRO_ARQUIVO_WRITE;
+                if (fwrite(&cab, sizeof(CABECALHO), 1, arquivo) != 1) return ERRO_ARQUIVO_WRITE;
 
-        fflush(arquivo);
-    }
+                fflush(arquivo);
+        }
 
-    // Retorna para posição anterior
-    if (fseek(arquivo, pos_atual, SEEK_SET) != 0) return ERRO_ARQUIVO_SEEK;
+        // Retorna para posição anterior
+        if (fseek(arquivo, pos_atual, SEEK_SET) != 0) return ERRO_ARQUIVO_SEEK;
 
-    return SUCESSO;
+        return SUCESSO;
 }
 
+void abrir_ou_criar_arquivo(const char* caminho) {
+        FILE* arquivo = fopen(caminho, "rb+");
+        if (!arquivo) {
+                arquivo = fopen(caminho, "wb+");
+                if (!arquivo) return;
+        }
 
-void abrir_ou_criar_arquivo(const char *caminho) {
-    FILE *arquivo = fopen(caminho, "rb+");
-    if (!arquivo) {
-        arquivo = fopen(caminho, "wb+");
-        if (!arquivo) return;
-    }
+        if (inicializar_arquivo_cabecalho(arquivo) != SUCESSO) {
+                fclose(arquivo);
+                return;
+        }
 
-    if (inicializar_arquivo_cabecalho(arquivo) != SUCESSO) {
         fclose(arquivo);
-        return;
-    }
-
-    fclose(arquivo);
 }
