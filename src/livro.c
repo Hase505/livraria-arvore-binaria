@@ -123,6 +123,6 @@ int imprimir_dados(FILE* arquivo, size_t codigo) {
                 free(res.pai);
                 return SUCESSO;
         }
-        printf("Livro com codigo:%zu, nao foi encontrado.", codigo);
+        printf("Livro com codigo %zu nao foi encontrado.\n", codigo);
         return ERRO_LIVRO_INVALIDO;
 }

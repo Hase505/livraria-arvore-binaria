@@ -25,7 +25,7 @@ int main(void) {
         while (opcao != 0) {
                 exibir_menu();
 
-                printf("Escolha uma opção: ");
+                printf("Escolha uma opcao: ");
                 opcao = (int)ler_size_t();
                 limpar_tela();
 
