@@ -115,7 +115,7 @@ int imprimir_dados(FILE* arquivo, size_t codigo) {
         if (status == SUCESSO) {
                 printf(
                     "Codigo: %zu\nTitulo: %s\nAutor: %s\nEditora: %s\nEdicao: %zu\nAno: "
-                    "%zu\nExemplares: %zu\nPreco: %lf\n\n",
+                    "%zu\nExemplares: %zu\nPreco: R$ %.2lf\n",
                     res.no->livro.codigo, res.no->livro.titulo, res.no->livro.autor,
                     res.no->livro.editora, res.no->livro.edicao, res.no->livro.ano,
                     res.no->livro.exemplares, res.no->livro.preco);
@@ -123,6 +123,6 @@ int imprimir_dados(FILE* arquivo, size_t codigo) {
                 free(res.pai);
                 return SUCESSO;
         }
-        printf("Livro com codigo:%zu, nao foi encontrado.", codigo);
+        printf("Livro com codigo %zu nao foi encontrado.\n", codigo);
         return ERRO_LIVRO_INVALIDO;
 }

@@ -159,4 +159,36 @@ NO_ARVORE* ler_no_arquivo(FILE* arquivo, const int posicao);
  */
 int imprimir_lista_livre(FILE* arquivo);
 
+/**
+ * @brief Abre um arquivo binário existente para leitura e escrita ou cria um novo arquivo caso não
+ * exista, inicializando seu cabeçalho.
+ *
+ * Esta função tenta abrir o arquivo no modo "rb+" (leitura e escrita binária). Se o arquivo não
+ * existir, ele é criado no modo "wb+". Após abrir/criar, o cabeçalho do arquivo é inicializado.
+ *
+ * @param caminho Caminho do arquivo binário a ser aberto ou criado.
+ *
+ * @note Caso não consiga abrir ou criar o arquivo, a função retorna sem mensagem de erro.
+ * @note O arquivo é fechado ao final da função.
+ */
+void abrir_ou_criar_arquivo(const char* caminho);
+
+/**
+ * @brief Inicializa o cabeçalho do arquivo binário se ele estiver vazio ou menor que o tamanho do
+ * cabeçalho.
+ *
+ * Esta função verifica o tamanho do arquivo e, caso ele seja menor que o tamanho da estrutura
+ * CABECALHO, inicializa o arquivo escrevendo uma estrutura CABECALHO zerada com valores padrão.
+ *
+ * @param arquivo Ponteiro para o arquivo binário aberto em modo leitura/escrita ("rb+" ou "wb+").
+ * @return int Código de status da operação:
+ *         - SUCESSO: cabeçalho inicializado ou já existente.
+ *         - ERRO_ARQUIVO_NULO: ponteiro para arquivo é NULL ou erro no ftell.
+ *         - ERRO_ARQUIVO_SEEK: erro ao posicionar o ponteiro do arquivo.
+ *         - ERRO_ARQUIVO_WRITE: erro ao escrever no arquivo.
+ *
+ * @note A função mantém o ponteiro do arquivo na posição original após a execução.
+ */
+int inicializar_arquivo_cabecalho(FILE* arquivo);
+
 #endif  // ARQUIVO_H

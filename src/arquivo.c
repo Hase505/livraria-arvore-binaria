@@ -265,7 +265,6 @@ int imprimir_lista_livre(FILE* arquivo) {
         if (cabecalho == NULL) return ERRO_CABECALHO_NULO;
 
         int pos = cabecalho->livre;
-        printf("Lista de nós livres:\n");
         if (pos == POSICAO_INVALIDA) {
                 printf("Nenhum nó livre disponível.\n");
                 free(cabecalho);
@@ -286,4 +285,80 @@ int imprimir_lista_livre(FILE* arquivo) {
 
         free(cabecalho);
         return SUCESSO;
+}
+
+/**
+ * @brief Inicializa o cabeçalho do arquivo binário se ele estiver vazio ou menor que o tamanho do
+ * cabeçalho.
+ *
+ * Esta função verifica o tamanho do arquivo e, caso ele seja menor que o tamanho da estrutura
+ * CABECALHO, inicializa o arquivo escrevendo uma estrutura CABECALHO zerada com valores padrão.
+ *
+ * @param arquivo Ponteiro para o arquivo binário aberto em modo leitura/escrita ("rb+" ou "wb+").
+ * @return int Código de status da operação:
+ *         - SUCESSO: cabeçalho inicializado ou já existente.
+ *         - ERRO_ARQUIVO_NULO: ponteiro para arquivo é NULL ou erro no ftell.
+ *         - ERRO_ARQUIVO_SEEK: erro ao posicionar o ponteiro do arquivo.
+ *         - ERRO_ARQUIVO_WRITE: erro ao escrever no arquivo.
+ *
+ * @note A função mantém o ponteiro do arquivo na posição original após a execução.
+ */
+int inicializar_arquivo_cabecalho(FILE* arquivo) {
+        if (arquivo == NULL) return ERRO_ARQUIVO_NULO;
+
+        // Salva posição atual
+        long pos_atual = ftell(arquivo);
+        if (pos_atual == -1L) return ERRO_ARQUIVO_NULO;
+
+        // Vai até o fim para descobrir o tamanho
+        if (fseek(arquivo, 0, SEEK_END) != 0) return ERRO_ARQUIVO_SEEK;
+        long tamanho = ftell(arquivo);
+        if (tamanho == -1L) return ERRO_ARQUIVO_NULO;
+
+        if ((size_t)tamanho < sizeof(CABECALHO)) {
+                // Arquivo vazio ou menor que o cabeçalho: inicializa
+                CABECALHO cab = {0};
+                cab.quantidade_livros = 0;
+                cab.topo = 0;
+                cab.livre = POSICAO_INVALIDA;
+                cab.raiz = -1;
+
+                if (fseek(arquivo, 0, SEEK_SET) != 0) return ERRO_ARQUIVO_SEEK;
+
+                if (fwrite(&cab, sizeof(CABECALHO), 1, arquivo) != 1) return ERRO_ARQUIVO_WRITE;
+
+                fflush(arquivo);
+        }
+
+        // Retorna para posição anterior
+        if (fseek(arquivo, pos_atual, SEEK_SET) != 0) return ERRO_ARQUIVO_SEEK;
+
+        return SUCESSO;
+}
+
+/**
+ * @brief Abre um arquivo binário existente para leitura e escrita ou cria um novo arquivo caso não
+ * exista, inicializando seu cabeçalho.
+ *
+ * Esta função tenta abrir o arquivo no modo "rb+" (leitura e escrita binária). Se o arquivo não
+ * existir, ele é criado no modo "wb+". Após abrir/criar, o cabeçalho do arquivo é inicializado.
+ *
+ * @param caminho Caminho do arquivo binário a ser aberto ou criado.
+ *
+ * @note Caso não consiga abrir ou criar o arquivo, a função retorna sem mensagem de erro.
+ * @note O arquivo é fechado ao final da função.
+ */
+void abrir_ou_criar_arquivo(const char* caminho) {
+        FILE* arquivo = fopen(caminho, "rb+");
+        if (!arquivo) {
+                arquivo = fopen(caminho, "wb+");
+                if (!arquivo) return;
+        }
+
+        if (inicializar_arquivo_cabecalho(arquivo) != SUCESSO) {
+                fclose(arquivo);
+                return;
+        }
+
+        fclose(arquivo);
 }
